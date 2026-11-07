@@ -1,0 +1,136 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile for seniors or family circle members.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user auth ID." },
+        "role": { "type": "string", "enum": ["senior", "family"], "description": "User role in the safety network." },
+        "displayName": { "type": "string", "description": "Display name of the user." },
+        "phone": { "type": "string", "description": "Contact phone number." },
+        "fontSizePreference": { "type": "string", "enum": ["standard", "large", "extra_large"], "description": "Accessibility font size." },
+        "highContrast": { "type": "boolean", "description": "Whether high contrast mode is active." },
+        "autoAlertOnScam": { "type": "boolean", "description": "Auto-notify family when a high-risk scam is detected." },
+        "createdAt": { "type": "number", "description": "Account creation timestamp." }
+      },
+      "required": ["uid", "role", "displayName"]
+    },
+    "TrustedContact": {
+      "title": "TrustedContact",
+      "description": "A trusted family member or carer linked to a senior.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique contact ID." },
+        "seniorUid": { "type": "string", "description": "The senior's UID." },
+        "name": { "type": "string", "description": "Contact name." },
+        "relationship": { "type": "string", "description": "Relationship (Daughter, Son, Neighbor, etc.)." },
+        "phone": { "type": "string", "description": "Contact telephone number." },
+        "status": { "type": "string", "enum": ["invited", "active"], "description": "Invitation status." },
+        "inviteToken": { "type": "string", "description": "32-character single-use invite token." },
+        "linkedUid": { "type": "string", "description": "Auth UID of the family member once accepted." },
+        "linkedAt": { "type": "number", "description": "Timestamp when invitation was accepted." }
+      },
+      "required": ["id", "seniorUid", "name", "relationship", "phone", "status"]
+    },
+    "AlertItem": {
+      "title": "AlertItem",
+      "description": "High-priority fraud alert or manual help request dispatched to family.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique alert ID." },
+        "seniorUid": { "type": "string", "description": "Senior UID who issued the alert." },
+        "seniorName": { "type": "string", "description": "Senior name." },
+        "seniorPhone": { "type": "string", "description": "Senior phone." },
+        "type": { "type": "string", "enum": ["scam_detected", "manual_help_request"], "description": "Alert trigger type." },
+        "verdict": { "type": "string", "enum": ["likely_scam", "caution", "looks_safe"], "description": "Scam verdict if applicable." },
+        "headline": { "type": "string", "description": "Short plain-language alert headline." },
+        "summary": { "type": "string", "description": "Plain-language summary of what happened." },
+        "actionTaken": { "type": "string", "description": "Immediate safe action taken." },
+        "sentAt": { "type": "number", "description": "Alert timestamp." },
+        "ackAt": { "type": "number", "description": "Timestamp when a family member acknowledged the alert." },
+        "acknowledgedBy": { "type": "string", "description": "Name or UID of family member who acknowledged." }
+      },
+      "required": ["id", "seniorUid", "seniorName", "type", "headline", "sentAt"]
+    },
+    "CoachSession": {
+      "title": "CoachSession",
+      "description": "A guided scenario lesson practice session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique session ID." },
+        "seniorUid": { "type": "string", "description": "Senior UID." },
+        "lessonId": { "type": "string", "description": "Lesson identifier." },
+        "currentStep": { "type": "number", "description": "Current step/scenario index (1-based)." },
+        "totalSteps": { "type": "number", "description": "Total steps in the lesson." },
+        "status": { "type": "string", "enum": ["active", "completed", "abandoned"], "description": "Session status." },
+        "score": { "type": "number", "description": "Number of correct scenario decisions." },
+        "startedAt": { "type": "number", "description": "Session start timestamp." },
+        "completedAt": { "type": "number", "description": "Session completion timestamp." }
+      },
+      "required": ["id", "seniorUid", "lessonId", "currentStep", "totalSteps", "status"]
+    },
+    "LessonDocument": {
+      "title": "LessonDocument",
+      "description": "Curated micro-lesson with interactive scenario cases.",
+      "type": "object",
+      "properties": {
+        "lessonId": { "type": "string", "description": "Unique slug for the lesson." },
+        "order": { "type": "number", "description": "Sort order." },
+        "title": { "type": "string", "description": "Lesson title." },
+        "track": { "type": "string", "enum": ["basics", "everyday", "safety"], "description": "Track topic category." },
+        "cardIcon": { "type": "string", "description": "Icon identifier." },
+        "minutes": { "type": "number", "description": "Estimated completion time in minutes." },
+        "mvp": { "type": "boolean", "description": "Whether included in the MVP core set." },
+        "goal": { "type": "string", "description": "Lesson learning goal." },
+        "finishTemplate": { "type": "string", "description": "Completion checklist template." },
+        "version": { "type": "number", "description": "Content schema version." }
+      },
+      "required": ["lessonId", "title", "track", "minutes"]
+    },
+    "ScamCheckRecord": {
+      "title": "ScamCheckRecord",
+      "description": "Record of a suspicious message or screenshot scam check.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Check record ID." },
+        "seniorUid": { "type": "string", "description": "Senior UID." },
+        "inputType": { "type": "string", "enum": ["text", "image"], "description": "Input mode." },
+        "previewText": { "type": "string", "description": "Cleaned message snippet." },
+        "verdict": { "type": "string", "enum": ["likely_scam", "caution", "looks_safe"], "description": "Evaluated verdict." },
+        "headline": { "type": "string", "description": "Plain language title." },
+        "explanation": { "type": "string", "description": "Two simple sentences explaining the verdict." },
+        "action": { "type": "string", "description": "Recommended immediate action." },
+        "riskScore": { "type": "number", "description": "Risk confidence score 0-100." },
+        "createdAt": { "type": "number", "description": "Analysis timestamp." }
+      },
+      "required": ["id", "seniorUid", "inputType", "verdict", "headline", "action"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles for seniors and family circle members."
+    },
+    "/users/{userId}/trustedContacts/{contactId}": {
+      "schema": "TrustedContact",
+      "description": "Trusted family contacts linked to a senior."
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": "CoachSession",
+      "description": "Scenario coaching lesson sessions."
+    },
+    "/alerts/{alertId}": {
+      "schema": "AlertItem",
+      "description": "Emergency help requests and high-risk scam alerts shared with family."
+    },
+    "/lessons/{lessonId}": {
+      "schema": "LessonDocument",
+      "description": "Curated lessons library."
+    },
+    "/scamChecks/{checkId}": {
+      "schema": "ScamCheckRecord",
+      "description": "Evaluated scam check verdicts."
+    }
+  }
+}

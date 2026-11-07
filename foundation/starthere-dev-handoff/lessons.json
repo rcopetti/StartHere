@@ -1,0 +1,1199 @@
+{
+  "collection": "lessons",
+  "schemaVersion": 2,
+  "lessons": [
+    {
+      "lessonId": "ai-basics",
+      "order": 1,
+      "title": "What AI can and can’t do",
+      "track": "basics",
+      "cardIcon": "school",
+      "minutes": 4,
+      "mvp": false,
+      "goal": "Learn how to use AI safely and spot fake AI scams asking for personal information.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "popup",
+            "sender": "AI Helper Assistant",
+            "senderDetail": "Chat Window • Just now",
+            "content": "Before I can answer your questions, please type your bank card number or PIN to verify your identity."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "A real AI helper never needs your bank PIN, card number, or passwords. Any assistant asking for private numbers is dangerous.",
+          "warningSigns": ["Asks for banking PIN or card details", "Blocks access until private information is shared"],
+          "safeAction": "Never type private numbers or passwords. Close the chat window immediately.",
+          "instruction": "Look at what this helper is asking for. Remember our number one safety rule.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the PIN request as a scam."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "popup",
+            "sender": "StartHere Coach",
+            "senderDetail": "Practice Screen • Today 2:15 PM",
+            "content": "Here are three gentle suggestions for your daughter's birthday note: 'Wishing you a day as wonderful as you are!'"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is exactly what a safe helper does: drafting helpful words without asking for money or personal secrets.",
+          "warningSigns": ["No links, fees, or private information requested", "Helpful writing suggestion"],
+          "safeAction": "Feel free to use or adapt the words for your greeting note.",
+          "instruction": "Notice the helper is just giving friendly suggestions with no pressure.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User correctly identifies the helpful draft as legitimate."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (800) 555-0188",
+            "senderDetail": "Text Message • Today 11:42 AM",
+            "content": "IRS AI Assistant: Our automated audit found an unpaid $320 tax balance. Tap ai-irs-settlement.org to clear your debt."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "The IRS never contacts people through text messages or uses text links to collect money. Scammers use words like 'AI' to sound official.",
+          "warningSigns": ["Tax collection via text message", "Threatening audit language", "Suspicious unofficial website link"],
+          "safeAction": "Do not tap the link. Delete the text message.",
+          "instruction": "Look at the sender and the threat of an audit in a text message.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake IRS text as a scam."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "popup",
+            "sender": "StartHere Coach",
+            "senderDetail": "Health Chat • Today 4:10 PM",
+            "content": "Here are 3 questions to ask your doctor about your new knee soreness. Remember: always consult your real physician for medical advice."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "A trustworthy helper helps you prepare questions but always reminds you to speak with a licensed doctor.",
+          "warningSigns": ["Recommends consulting a real professional", "No medical diagnosis or medication claims"],
+          "safeAction": "Save or print your questions to bring to your appointment.",
+          "instruction": "Notice how the coach encourages checking with a real doctor.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the doctor preparation helper as legitimate."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "popup",
+            "sender": "Browser Security Warning",
+            "senderDetail": "Pop-up Alert • Just now",
+            "content": "CRITICAL ALERT: Smart AI Scanner found 7 severe viruses. Your photos will be erased in 5 minutes! Call 1-800-555-0149 now."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Real security tools never lock your screen with a countdown timer or ask you to call a phone number.",
+          "warningSigns": ["Urgent 5-minute countdown clock", "Threatens to erase photos", "Presents a 1-800 phone number to call"],
+          "safeAction": "Do not call the number. Close your browser tab or restart your phone.",
+          "instruction": "Look at the loud alarm and countdown clock trying to rush you.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake virus pop-up as a scam."
+        }
+      ],
+      "finishTemplate": "My AI safety rules:\n1. Never share passwords, card numbers, or PINs with any helper.\n2. Watch out for scams pretending to be official AI services.\n3. Always double-check medical, legal, and financial advice with real human experts.",
+      "version": 2
+    },
+    {
+      "lessonId": "thank-you-note",
+      "order": 2,
+      "title": "Write a thank-you note",
+      "track": "everyday",
+      "cardIcon": "mail",
+      "minutes": 5,
+      "mvp": true,
+      "goal": "Learn how to spot authentic notes from family and avoid fake greeting card scams.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "sms",
+            "sender": "Sarah (Daughter)",
+            "senderDetail": "Text Message • Today 12:45 PM",
+            "content": "Hi Mom! Thank you so much for the delicious pie and the lovely card. The kids loved it! See you Sunday ❤️"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a warm, personal message from your saved family contact with no links or strange requests.",
+          "warningSigns": ["From your known saved contact", "Personal specific family details", "No suspicious links or requests"],
+          "safeAction": "Reply warmly or send a little heart emoji.",
+          "instruction": "Review the sender and the natural family tone.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the text from daughter as legitimate."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "email",
+            "sender": "cards@greeting-e-gift-cards.com",
+            "senderDetail": "Subject: You received an e-Greeting! • 3:18 PM",
+            "content": "A secret admirer sent you a digital singing greeting card! Click here to download Card_Viewer.exe and view your gift."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Real friends don't ask you to download computer files (.exe or .zip) to view a card. That file contains dangerous software.",
+          "warningSigns": ["Anonymous sender claiming to be a secret admirer", "Asks you to download an executable file", "Unfamiliar greeting card website"],
+          "safeAction": "Do not download or open any attachments. Delete the email.",
+          "instruction": "Notice the dangerous download attachment in this unexpected card.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User flags the executable download greeting card as a scam."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "Linda (Neighbor)",
+            "senderDetail": "Text Message • Yesterday 5:02 PM",
+            "content": "Hi Eleanor, thanks so much for watching Buster yesterday! I left fresh tomatoes from my garden on your porch."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a genuine note from a trusted neighbor talking about real shared activities.",
+          "warningSigns": ["From saved neighbor contact", "References real pet and garden favor", "Zero links or solicitations"],
+          "safeAction": "Enjoy the fresh tomatoes and reply with thanks.",
+          "instruction": "Look at the natural conversation between friends.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the neighbor's note as legitimate."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "whatsapp",
+            "sender": "Unknown Number (+44 7911 123456)",
+            "senderDetail": "WhatsApp Message • Today 1:20 PM",
+            "content": "Hallmark Gifts: Someone sent you a $50 thank-you gift card. Enter your credit card to pay $1.50 processing fee to receive it."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "You never have to give your credit card number or pay money to receive a gift. Scammers use this trick to steal card information.",
+          "warningSigns": ["Foreign international phone number", "Requires paying money to receive a gift", "Asks for credit card details"],
+          "safeAction": "Block the sender and do not give your credit card number.",
+          "instruction": "Examine the demand for credit card details to get a gift.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake gift fee message as a scam."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "email",
+            "sender": "community@stmarks-parish.org",
+            "senderDetail": "Subject: Thank you for joining the bake sale! • 9:00 AM",
+            "content": "Dear friends, thank you for supporting this weekend's charity bake sale. Together we raised $640 for the food pantry!"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is an official church or community newsletter from a recognized organization domain.",
+          "warningSigns": ["Recognized community organization address", "Informational thank-you summary", "No urgent pressure or sensitive requests"],
+          "safeAction": "No action needed; safely read and enjoy the community update.",
+          "instruction": "Look at the verified organization address and community update.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the community email as legitimate."
+        }
+      ],
+      "finishTemplate": "Thank-you notes checklist:\n1. Personal notes from saved contacts are safe.\n2. Never download files (.exe or .zip) to view a card.\n3. Never pay a fee or enter your credit card to claim a gift.",
+      "version": 2
+    },
+    {
+      "lessonId": "day-trip",
+      "order": 3,
+      "title": "Plan a day trip",
+      "track": "everyday",
+      "cardIcon": "map",
+      "minutes": 6,
+      "mvp": true,
+      "goal": "Distinguish between genuine travel confirmations and travel booking scams.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "email",
+            "sender": "reservations@stateparks.gov",
+            "senderDetail": "Subject: Park Pavilion Reservation #8421 • Yesterday",
+            "content": "Your day pass for Oak Creek State Park is confirmed for Saturday. Park gates open at 8:00 AM. Show this barcode at entry."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This email comes from an official government domain (.gov) confirming a trip reservation with clear details.",
+          "warningSigns": ["Official .gov domain", "Matches real reservation details", "Barcode included with clear park hours"],
+          "safeAction": "Keep the email or print the barcode for your day trip.",
+          "instruction": "Examine the email address and clear booking details.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User confirms the official park reservation email is legitimate."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (855) 555-0199",
+            "senderDetail": "Text Message • Today 7:15 AM",
+            "content": "URGENT AIRLINE NOTICE: Your morning flight has been cancelled. Call our reservation desk immediately at 1-855-555-0199 to claim refund."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Notice that it doesn't name an airline, flight number, or your name! Scammers send this blast to panic people into calling fake agents.",
+          "warningSigns": ["No flight number or airline name mentioned", "Artificial panic and urgency", "Unknown toll-free number"],
+          "safeAction": "Do not call the number. If traveling, check the airline's official app or ticket.",
+          "instruction": "Look closely: does it mention your name or which airline?",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User spots the missing details and identifies the flight scam."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "Metro Transit (Shortcode: 32321)",
+            "senderDetail": "Text Alert • Today 1:04 PM",
+            "content": "Route 12 Bus arriving at Pine & 4th in 4 mins. Service running on regular schedule."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is an automated arrival text from an official 5-digit municipal transit shortcode.",
+          "warningSigns": ["Sent from official 5-digit shortcode", "Specific route and stop information", "No links or payment requests"],
+          "safeAction": "Head to the bus stop when you are ready.",
+          "instruction": "Check the sender shortcode and helpful transit update.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User confirms the transit alert is legitimate."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "sms",
+            "sender": "12 (16) 555-0132",
+            "senderDetail": "Text Message • Today 4:50 PM",
+            "content": "Holiday Resort Winner: You were selected for a luxury weekend getaway! Pay $4.95 handling to claim your voucher: resort-claim-pass.top"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "You never win a vacation you didn't enter. The small $4.95 fee is a bait to capture your debit or credit card number.",
+          "warningSigns": ["Claims you won a contest you never entered", "Small fee bait to get card numbers", "Odd web address ending in .top"],
+          "safeAction": "Delete the text and never tap links from unknown numbers.",
+          "instruction": "Look at the small fee trap to claim an unexpected prize.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake prize trip text as a scam."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "email",
+            "sender": "tickets@citybotanicalgardens.org",
+            "senderDetail": "Subject: Your Visit to the Rose Garden • Yesterday",
+            "content": "Thank you for reserving senior admission tickets for Saturday. Doors open at 10 AM. Free wheelchair loans are available at Visitor Center."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "Legitimate non-profit botanical garden email with helpful accessibility details and exact hours.",
+          "warningSigns": ["Official organization email domain", "Helpful accessibility information", "No payment demands or links"],
+          "safeAction": "Save the email for your weekend garden visit.",
+          "instruction": "Notice the reassuring museum details and visitor hours.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the garden admission email as legitimate."
+        }
+      ],
+      "finishTemplate": "Day trip travel safety:\n1. Verify flight and travel changes inside official apps, not text messages.\n2. Official park and museum tickets come from verified .gov or .org addresses.\n3. Never pay a fee to claim a surprise free trip.",
+      "coachNote": "Remind seniors to always verify trip details directly with the venue or airline.",
+      "version": 2
+    },
+    {
+      "lessonId": "doctor-questions",
+      "order": 4,
+      "title": "Prepare questions for my doctor",
+      "track": "everyday",
+      "cardIcon": "medical_services",
+      "minutes": 6,
+      "mvp": true,
+      "goal": "Spot genuine clinic and pharmacy messages and protect health information from Medicare scams.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "sms",
+            "sender": "Clinic Reminders (Shortcode: 48291)",
+            "senderDetail": "Text Message • Today 9:30 AM",
+            "content": "Appointment Reminder: Dr. Martinez on Thursday, Nov 12 at 2:15 PM. Reply 1 to confirm, 2 to reschedule. Dr. Martinez Family Practice."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a standard appointment reminder from your doctor's office using an official healthcare shortcode. Replying 1 or 2 is safe.",
+          "warningSigns": ["Names your actual doctor and practice", "Official healthcare shortcode", "Simple 1 or 2 reply without links"],
+          "safeAction": "Reply 1 if you can make it, or call the office if you need to change times.",
+          "instruction": "Look at the sender shortcode and specific doctor name.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the legitimate clinic reminder."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (800) 555-0143",
+            "senderDetail": "Text Message • Today 11:15 AM",
+            "content": "MEDICARE ALERT: Your Medicare benefits have been suspended. To order your new plastic chip card, verify your SSN at medicare-benefits-update.cc"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Medicare will NEVER text you out of the blue, threaten to suspend your benefits, or ask for your Social Security number over a link.",
+          "warningSigns": ["Threatens benefit suspension", "Demands Social Security Number", "Unofficial website address ending in .cc"],
+          "safeAction": "Never tap the link or give your SSN. Delete the text.",
+          "instruction": "Notice the threat to cancel your Medicare and the request for your SSN.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User flags the fake Medicare text as a scam."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "CVS Pharmacy (Shortcode: 28728)",
+            "senderDetail": "Text Alert • Today 1:20 PM",
+            "content": "CVS: Your prescription for Lisinopril is ready for pickup at 450 Main St. Store hours today until 8:00 PM."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is an authentic pharmacy pickup notification with your medication name and local store address.",
+          "warningSigns": ["Official pharmacy shortcode", "Accurate medication name and store address", "No links or payment demands"],
+          "safeAction": "Pick up your prescription when ready.",
+          "instruction": "Examine the verified pharmacy shortcode and local store address.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the pharmacy pickup alert as legitimate."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "phone_call",
+            "sender": "Unknown Caller (1-888-555-0199)",
+            "senderDetail": "Voicemail • Today 3:00 PM",
+            "content": "This is the Medical Billing Department. You have an unpaid $420 blood test bill. To avoid legal collection, call back and pay via Target gift cards."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "No legitimate doctor, lab, or hospital ever accepts gift cards as payment. Anyone asking for gift cards is always a scammer.",
+          "warningSigns": ["Demands payment in store gift cards", "Threatens immediate legal collection", "Vague 'Medical Billing Department' caller"],
+          "safeAction": "Hang up or delete the voicemail. Never buy gift cards for callers.",
+          "instruction": "Listen for the biggest red flag in healthcare: paying with gift cards.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User catches the gift card demand and marks it as a scam."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "email",
+            "sender": "noreply@mychart-healthcare.org",
+            "senderDetail": "Subject: New lab results available • 4:45 PM",
+            "content": "A new test result has been posted to your secure MyChart patient portal by Dr. Martinez. Sign in to your patient portal to view details."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "Legitimate healthcare portals notify you that results are ready and advise you to sign in to your existing secure patient portal.",
+          "warningSigns": ["Verified healthcare portal address", "Does not put sensitive diagnosis in plain email", "Names your actual physician"],
+          "safeAction": "Log in to your patient portal as you normally do.",
+          "instruction": "Notice how the portal protects privacy by asking you to sign in securely.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User recognizes the authentic patient portal notification."
+        }
+      ],
+      "finishTemplate": "Doctor & medical message rules:\n1. Real doctors and clinics never ask for payment with gift cards.\n2. Medicare never texts links or threatens to cancel your card.\n3. Always call your doctor's office directly using the phone number on your clinic card.",
+      "coachNote": "Never diagnose or suggest treatments; teach seniors how to verify clinic communications.",
+      "version": 2
+    },
+    {
+      "lessonId": "explain-a-letter",
+      "order": 5,
+      "title": "Make sense of a confusing letter or bill",
+      "track": "everyday",
+      "cardIcon": "description",
+      "minutes": 5,
+      "mvp": false,
+      "goal": "Learn how to read bills carefully and spot fake property or government notices.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "popup",
+            "sender": "Physical Mail Paper Letter",
+            "senderDetail": "Mailed to Home • City Water Dept",
+            "content": "City Water Utility: Account #48291. Service address: 742 Evergreen Terr. Total due: $48.20 by Dec 1st. Payment stub with city hall address enclosed."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a standard municipal water bill with your exact home address, reasonable monthly amount, and return address to city hall.",
+          "warningSigns": ["Accurate home address and account number", "Normal billing cycle and reasonable amount", "Official city hall payment address"],
+          "safeAction": "Pay as you normally do by check or your official city billing account.",
+          "instruction": "Check the familiar address and normal billing amount.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the genuine water bill."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "popup",
+            "sender": "Urgent Official Notice",
+            "senderDetail": "Letter with Bold Red Ink",
+            "content": "COUNTY DEED ALERT: Your home deed is in jeopardy. Pay $1,450 title protection fee within 48 hours via Western Union to Deed Box #44, Orlando FL."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "This is a predatory deed scam. Real county deed offices never demand wire transfers or Western Union payments to private PO boxes.",
+          "warningSigns": ["Urgent threat to take your home", "Demands payment via Western Union or wire transfer", "Out-of-state private PO Box address"],
+          "safeAction": "Do not send any money. Show the letter to a trusted family member or call the county clerk directly.",
+          "instruction": "Look at the urgent threat and the request for a wire transfer.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the deed extortion letter as a scam."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "popup",
+            "sender": "Social Security Administration",
+            "senderDetail": "Annual Letter • Baltimore MD",
+            "content": "Your Social Security Benefit Statement: Shows estimated monthly retirement benefits and 2026 cost of living adjustment. No action is required."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "The official annual SSA statement clearly states 'No action is required' and provides educational benefit information.",
+          "warningSigns": ["Official SSA letterhead", "States clearly that no action is required", "No payment or bank information asked"],
+          "safeAction": "File the statement with your tax papers for your records.",
+          "instruction": "Notice the reassuring statement that no action is required.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User recognizes the official SSA statement as legitimate."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "popup",
+            "sender": "Gold Seal Inheritance Agency",
+            "senderDetail": "Letter with Fake Gold Stamp",
+            "content": "UNCLAIMED ESTATE NOTICE: You are the sole beneficiary of a $3.2 Million estate. Send $250 notarization processing fee in cash to claim funds."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "You never have to pay upfront cash fees to claim a real inheritance. Scammers send millions of these letters hoping people send cash.",
+          "warningSigns": ["Unsolicited millions of dollars inheritance", "Demands cash upfront to receive money", "Fake official seals and legal jargon"],
+          "safeAction": "Toss the letter in the recycling bin. Never send cash in the mail.",
+          "instruction": "Look at the promise of millions in exchange for upfront cash.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User flags the fake inheritance letter as a scam."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "popup",
+            "sender": "Electric Power Co.",
+            "senderDetail": "Letter • Scheduled Work Notice",
+            "content": "Notice of Planned Tree Trimming: Crews will trim branches near power lines on Maple Street next Wednesday between 9 AM and 1 PM. No power outage expected."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a courtesy neighborhood maintenance notice with no demands, links, or fees.",
+          "warningSigns": ["Neighborhood maintenance courtesy notice", "No money or personal information requested", "Clear utility contact number"],
+          "safeAction": "Keep in mind for Wednesday morning; no response necessary.",
+          "instruction": "Notice this is simply an informational courtesy notice for your street.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the utility maintenance letter as legitimate."
+        }
+      ],
+      "finishTemplate": "Reading letters & bills safely:\n1. Regular bills match your home address and past history.\n2. Letters demanding cash, gift cards, or wire transfers are scams.\n3. When unsure, call the company using a phone number from an old paper bill you already trust.",
+      "version": 2
+    },
+    {
+      "lessonId": "grocery-list",
+      "order": 6,
+      "title": "Plan a meal and a grocery list",
+      "track": "everyday",
+      "cardIcon": "shopping_cart",
+      "minutes": 5,
+      "mvp": false,
+      "goal": "Spot genuine supermarket coupons and avoid fake voucher surveys.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "email",
+            "sender": "coupons@safeway-supermarkets.com",
+            "senderDetail": "Weekly Circular • Wednesday Morning",
+            "content": "This week's fresh specials: Crisp Honeycrisp apples $1.49/lb, roasted chicken $6.99, and digital coupons for your club card."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a genuine store circular showing normal weekly grocery discounts from an official grocery store email address.",
+          "warningSigns": ["Official supermarket domain", "Realistic grocery prices and weekly specials", "No demands for credit card or private data"],
+          "safeAction": "Add any favorite items to your shopping list.",
+          "instruction": "Look at the standard grocery circular prices and products.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the weekly supermarket circular as legitimate."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (833) 555-0177",
+            "senderDetail": "Text Message • Today 2:30 PM",
+            "content": "Kroger Rewards: Congratulations! You were selected for a $200 grocery voucher. Answer 3 quick survey questions and enter card details: kroger-card-reward.xyz"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Supermarkets never give away free $200 vouchers through text messages, and they never ask for card details to give a coupon.",
+          "warningSigns": ["Unrealistic free $200 voucher promise", "Asks for bank card details for a survey", "Suspicious .xyz domain"],
+          "safeAction": "Do not tap the link or enter your card. Delete the text.",
+          "instruction": "Notice the huge $200 prize and the request for card details.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User spots the fake grocery voucher survey scam."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "Grocery Curbside (Shortcode: 94821)",
+            "senderDetail": "Text Alert • Today 11:00 AM",
+            "content": "Your grocery pickup order #4190 is packed and ready. Pull into spaces 1-4 at Oak Street store and tap 'I'm Here' in the store app."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a real curbside pickup notification from a store order shortcode with parking bay instructions.",
+          "warningSigns": ["Official 5-digit shortcode", "Specific order number and pickup bay instructions", "Guides you to the official app"],
+          "safeAction": "Drive to the store pickup area when you are ready.",
+          "instruction": "Examine the practical pickup instructions and order number.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User recognizes the curbside pickup notification as legitimate."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "sms",
+            "sender": "12 (16) 555-0132",
+            "senderDetail": "Text Message • Today 4:15 PM",
+            "content": "Grocery Express: Your food delivery failed because driver could not verify payment. Click now to re-enter your debit card: food-reorder-pay.info"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "If you didn't order food delivery today, this is a scam aiming to capture your debit card details on a fake link.",
+          "warningSigns": ["Unexpected delivery notification when no order was made", "Requests debit card re-entry via text link", "Strange .info domain"],
+          "safeAction": "Do not tap the link. If you did order food, check the store app directly.",
+          "instruction": "Look at the surprise delivery failure and the link asking for card numbers.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake food delivery link as a scam."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "popup",
+            "sender": "Store Loyalty Rewards",
+            "senderDetail": "Store Receipt App • Today 6:00 PM",
+            "content": "You earned 120 Gas Reward Points on your shopping trip today. Current fuel discount: 20¢ off per gallon at partner stations."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a normal rewards summary from your grocery loyalty account celebrating points earned on your purchase.",
+          "warningSigns": ["Standard loyalty rewards information", "Matches real purchase activity", "No payment or sensitive data required"],
+          "safeAction": "Use your discount at the pump whenever you fill up.",
+          "instruction": "Notice the routine reward points summary from your loyalty card.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the loyalty points notice as legitimate."
+        }
+      ],
+      "finishTemplate": "Grocery shopping safely:\n1. Supermarket circulars and coupons never ask for your bank card number.\n2. Free $200 voucher texts are scams to steal credit cards.\n3. Always check orders inside the official store app.",
+      "version": 2
+    },
+    {
+      "lessonId": "fake-bank-text",
+      "order": 7,
+      "title": "Spot a fake bank text",
+      "track": "safety",
+      "cardIcon": "sms_failed",
+      "minutes": 5,
+      "mvp": false,
+      "goal": "Recognize the warning signs of fake bank messages and know the safe next step.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "sms",
+            "sender": "12 (16) 555-0132",
+            "senderDetail": "Text Message • Today 6:08 PM",
+            "content": "WhatsApp: We have received a request to reset your PIN\nPlease send the 6-digit code to verify this request:"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "WhatsApp will NEVER ask you to reply with your 6-digit verification code. If someone asks for your code, they are trying to steal your account.",
+          "warningSigns": ["Requests secret 6-digit verification code", "Unsolicited PIN reset request", "Sent from unknown personal phone number"],
+          "safeAction": "Never share verification codes with anyone. Ignore and delete this message.",
+          "instruction": "Look closely at the sender and the request for your 6-digit code.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User correctly identifies the 6-digit verification code request as a scam."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "sms",
+            "sender": "Chase Fraud Prevention (Shortcode: 28107)",
+            "senderDetail": "Text Alert • Today 2:15 PM",
+            "content": "Chase Fraud Alert: Did you attempt a $28.50 charge at Shell Oil on 11/07? Reply YES or NO. (We will never ask for your password or PIN via text)."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "Real banks use official 5-digit shortcodes, ask only for a simple YES or NO, and explicitly remind you they will never ask for your password or PIN.",
+          "warningSigns": ["Sent from official bank shortcode", "Only asks for YES or NO", "Reassuring privacy reminder included"],
+          "safeAction": "Reply YES if you made the purchase, or NO if you didn't.",
+          "instruction": "Notice how the bank tells you they will NEVER ask for passwords or PINs.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the verified bank fraud shortcode text as legitimate."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (800) 555-0192",
+            "senderDetail": "Text Message • Today 4:40 PM",
+            "content": "BANK ALERT: Your account has been locked due to unusual activity. Verify your identity within 24 hours at secure-bank-verify.example.com or your account will be closed."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Scammers create false panic like 'within 24 hours' and send you to fake web links to steal your bank password.",
+          "warningSigns": ["Artificial 24-hour urgency deadline", "Threat to close your account", "Suspicious web link"],
+          "safeAction": "Do not tap the link. Call the phone number on the back of your bank card.",
+          "instruction": "Notice the rush: 'within 24 hours' and the strange web address.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the urgent locked bank text as a scam."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "sms",
+            "sender": "Bank of America (Shortcode: 73981)",
+            "senderDetail": "Text Alert • Yesterday 9:00 AM",
+            "content": "BofA Alert: Your monthly electronic statement for account ending in ...4182 is now ready to view in our mobile app or online banking."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "Authentic bank statements notifications direct you to the bank's own app and don't include risky external links.",
+          "warningSigns": ["Sent from official bank shortcode", "Directs you to open the existing app", "Only displays the last 4 digits of your account"],
+          "safeAction": "Open your bank app when you want to review your statement.",
+          "instruction": "Notice the partial account number and advice to use the official app.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the official statement alert as legitimate."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (888) 555-0144",
+            "senderDetail": "Text Message • Today 5:20 PM",
+            "content": "Wells Fargo Security: A withdrawal of $1,400.00 is pending. If this was not you, call our urgent fraud department immediately at 1-888-555-0144."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Scammers put fake phone numbers in texts hoping you'll call them directly so they can trick you into sending money.",
+          "warningSigns": ["High dollar amount designed to scare you", "Tells you to call an unfamiliar phone number", "Not from an official bank shortcode"],
+          "safeAction": "Never call the phone number inside the text. Call the number printed on the back of your physical bank card.",
+          "instruction": "Look at the scary $1,400 withdrawal and the phone number they want you to call.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User flags the fake bank withdrawal alert as a scam."
+        }
+      ],
+      "finishTemplate": "My bank safety rule: If a message rushes me, asks for a verification code, or tells me to tap a link or call an unknown number, I stop and call the number printed on the back of my bank card.",
+      "version": 2
+    },
+    {
+      "lessonId": "family-emergency-call",
+      "order": 8,
+      "title": "When “family” calls in trouble",
+      "track": "safety",
+      "cardIcon": "call",
+      "minutes": 6,
+      "mvp": false,
+      "goal": "Know what to do when a caller claiming to be a loved one urgently asks for money.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "phone_call",
+            "sender": "Unknown Number (Caller ID: Grandson)",
+            "senderDetail": "Incoming Call • Today 3:15 PM",
+            "content": "Grandma, it's me! I was in a terrible car accident and I'm in jail. Please send $2,500 in Apple gift cards for my bail, and whatever you do, don't tell Mom!"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "This is the classic 'grandparent scam'. Real courts and police never take gift cards for bail, and scammers always plead with you not to tell other family members.",
+          "warningSigns": ["Demands secret payment with gift cards", "Begs you not to tell other family members", "Extreme emotional panic and artificial urgency"],
+          "safeAction": "Hang up immediately. Call your grandchild or their parents on their known normal phone numbers.",
+          "instruction": "Listen for the secret emergency and the demand for gift cards.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User spots the grandparent emergency scam."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "sms",
+            "sender": "Tom (Son)",
+            "senderDetail": "Text Message • Today 1:10 PM",
+            "content": "Hey Dad, running a bit late for dinner because of traffic on I-80. Should be there by 5:30. Do you need me to grab milk?"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a normal family text from your saved contact with familiar everyday conversation.",
+          "warningSigns": ["From saved contact", "Normal everyday delay and grocery offer", "No financial demands or panic"],
+          "safeAction": "Reply telling him safe driving and yes/no on the milk.",
+          "instruction": "Check the familiar contact and everyday routine message.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the message from son as legitimate."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "phone_call",
+            "sender": "Unknown Caller (+52 55 1234 5678)",
+            "senderDetail": "Incoming Call • Today 11:30 AM",
+            "content": "This is Officer Davis at the border. Your nephew was detained. Wire $1,800 through Western Union within 30 minutes or he will face prison."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Law enforcement agencies never demand wire transfers or threaten immediate imprisonment over the phone.",
+          "warningSigns": ["Demands immediate Western Union wire transfer", "30-minute panic deadline", "Foreign phone number"],
+          "safeAction": "Hang up right away. Call your nephew directly on his regular phone number.",
+          "instruction": "Notice the wire transfer demand and short 30-minute threat.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake officer wire scam."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "phone_call",
+            "sender": "Sarah (Daughter)",
+            "senderDetail": "Voicemail • Yesterday 6:20 PM",
+            "content": "Hi Mom, just calling to see how your doctor checkup went yesterday. Give me a call back whenever you're free. Love you!"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a loving voicemail from your daughter with zero urgency or money requests.",
+          "warningSigns": ["From saved contact", "Caring family check-in", "No pressure or financial requests"],
+          "safeAction": "Call her back when you are free.",
+          "instruction": "Notice the calm, loving tone from your trusted family member.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User recognizes the daughter's voicemail as legitimate."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "sms",
+            "sender": "Unknown Number (1-415-555-0182)",
+            "senderDetail": "Text Message • Today 4:05 PM",
+            "content": "Hey Grandma, my phone dropped in water so I'm texting from a friend's phone. Can you Zelle or CashApp me $150 so I can tow my car?"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Scammers often claim their phone is broken as an excuse for using a strange number to ask for money.",
+          "warningSigns": ["Claims to be a grandchild from an unknown number", "'Broken phone' excuse", "Asks for immediate Zelle or CashApp transfer"],
+          "safeAction": "Never send money. Call your grandchild on the number you already have saved in your contacts.",
+          "instruction": "Look at the 'broken phone' excuse from an unknown phone number.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the imposter grandchild text as a scam."
+        }
+      ],
+      "finishTemplate": "Family emergency safety rule: If someone claiming to be a loved one calls or texts in trouble asking for money, I hang up, call them on the number I already have saved, and check with family first. Gift cards, wires, or Zelle mean scam.",
+      "coachNote": "Never ask for or store family passwords or secret safe words.",
+      "version": 2
+    },
+    {
+      "lessonId": "tech-support-popup",
+      "order": 9,
+      "title": "The scary computer pop-up",
+      "track": "safety",
+      "cardIcon": "computer",
+      "minutes": 5,
+      "mvp": false,
+      "goal": "Handle fake virus warnings and tech-support pop-ups safely.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "popup",
+            "sender": "Red Warning Pop-Up Screen",
+            "senderDetail": "Browser Window • Flashing Red",
+            "content": "WARNING! Your computer is infected with 5 spyware viruses. Your bank details are at risk. Call Microsoft Support now at 1-800-555-0142. Do not close this window."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Real companies like Microsoft or Apple NEVER put phone numbers in pop-up screens or tell you not to close your window.",
+          "warningSigns": ["Loud alarming screen with phone number to call", "Claims your bank details are at risk", "Tells you not to close the window"],
+          "safeAction": "Do not call the phone number. Close the browser tab or restart your device.",
+          "instruction": "Look at the scary warning telling you not to close your browser.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake tech support pop-up as a scam."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "popup",
+            "sender": "System Settings",
+            "senderDetail": "Operating System Banner • Today 10:00 AM",
+            "content": "System Software Update: Security update 17.5 is ready to install. Restart tonight or install now in Settings."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "Legitimate operating system updates appear in your device's own Settings, with no phone numbers, fees, or urgent threats.",
+          "warningSigns": ["Official device settings notification", "No phone numbers or panic language", "Offers to install automatically overnight"],
+          "safeAction": "Install the update overnight while your phone or computer is charging.",
+          "instruction": "Notice how calm and routine the official system update notification is.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the genuine system update as legitimate."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "phone_call",
+            "sender": "Caller ID: Apple Support (1-800-555-0199)",
+            "senderDetail": "Incoming Call • Today 2:40 PM",
+            "content": "Hello, this is Apple Care. We detected foreign hackers inside your device right now. You must download AnyDesk software so our engineer can take control and clean it."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Apple and Microsoft will NEVER call you out of the blue to claim your computer is hacked or ask to control your screen.",
+          "warningSigns": ["Unsolicited call claiming your device is hacked", "Asks to install remote screen-sharing software (AnyDesk)", "High-pressure urgency"],
+          "safeAction": "Hang up immediately. Never let a stranger take control of your computer or phone screen.",
+          "instruction": "Watch out for strangers asking to take remote control of your screen.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the remote desktop caller as a scam."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "popup",
+            "sender": "Safari Browser",
+            "senderDetail": "Official Browser Dialog • Today 4:10 PM",
+            "content": "Website 'myweather.com' would like to use your current location to show local weather forecast. [Don't Allow] [Allow Once]"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a standard browser permission prompt asking if a weather website can check your location for your local forecast.",
+          "warningSigns": ["Standard browser dialog buttons", "Explains clear purpose (local forecast)", "Gives simple Don't Allow choice"],
+          "safeAction": "Tap 'Allow Once' if you want local weather, or 'Don't Allow' if you prefer.",
+          "instruction": "Notice the clean, standard browser permission buttons.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User confirms the standard browser permission prompt is legitimate."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "email",
+            "sender": "billing-support@geeksquad-renew-invoice.top",
+            "senderDetail": "Subject: Auto-Renewal Invoice #83921 • 1:15 PM",
+            "content": "Geek Squad Protection: Your yearly anti-virus subscription of $499.00 has been debited from your checking account. If you did not authorize this, call 1-888-555-0176 now to cancel."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "This fake invoice scam tries to frighten you with a large charge so you call the fake phone number, where they pretend to give a refund and steal your money.",
+          "warningSigns": ["Invoice for a service you never signed up for", "Huge $499 unexpected charge", "Tells you to call an urgent number to cancel"],
+          "safeAction": "Do not call the number. Check your real bank statement directly to confirm no such charge happened.",
+          "instruction": "Look at the fake $499 renewal charge and the phone number to call.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake Geek Squad invoice as a scam."
+        }
+      ],
+      "finishTemplate": "Tech support safety rule: Pop-ups with phone numbers are always fake. I never call numbers in pop-ups, and I never let a stranger take control of my screen.",
+      "version": 2
+    },
+    {
+      "lessonId": "package-delivery-text",
+      "order": 10,
+      "title": "The package delivery text",
+      "track": "safety",
+      "cardIcon": "local_shipping",
+      "minutes": 4,
+      "mvp": false,
+      "goal": "Spot fake delivery fees and verify parcel tracking safely.",
+      "steps": [
+        {
+          "order": 1,
+          "scene": {
+            "type": "sms",
+            "sender": "12 (16) 555-0132",
+            "senderDetail": "Text Message • Today 4:32 PM",
+            "content": "USPS: Your package is on hold due to an unpaid $1.99 redelivery fee. Pay within 12 hours to avoid return: usps-redeliver.example.com"
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "The post office does not hold packages for tiny $1.99 fees or text you links to pay. Scammers use the small fee to steal your credit card number.",
+          "warningSigns": ["Small fee bait ($1.99)", "12-hour panic deadline", "Unofficial link pretending to be USPS"],
+          "safeAction": "Never tap the link or pay fees from a text. Delete the message.",
+          "instruction": "Look at the small $1.99 fee and the rush to pay within 12 hours.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the fake USPS redelivery fee as a scam."
+        },
+        {
+          "order": 2,
+          "scene": {
+            "type": "sms",
+            "sender": "UPS Alerts (Shortcode: 87748)",
+            "senderDetail": "Text Alert • Today 2:05 PM",
+            "content": "UPS: Package 1Z9999999999999999 was delivered to your front porch at 2:03 PM. No signature required."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a real UPS delivery confirmation from their official verified 5-digit shortcode, with no links or payment demands.",
+          "warningSigns": ["Official verified shortcode (87748)", "Valid tracking number format", "No links, fees, or personal questions"],
+          "safeAction": "Check your front porch when convenient.",
+          "instruction": "Notice the verified 5-digit shortcode and simple delivery notice.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User marks the official UPS delivery confirmation as legitimate."
+        },
+        {
+          "order": 3,
+          "scene": {
+            "type": "sms",
+            "sender": "1 (833) 555-0144",
+            "senderDetail": "Text Message • Today 11:20 AM",
+            "content": "FedEx: Delivery stopped because street number is missing from label. Tap fedx-address-correction.xyz to enter your street and credit card."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "FedEx does not ask for your credit card to correct a house number. Look at the misspelled web link 'fedx' with .xyz at the end.",
+          "warningSigns": ["Misspelled name 'fedx'", "Asks for credit card to fix an address", "Strange website ending in .xyz"],
+          "safeAction": "Do not tap the link or enter card details. Delete the text.",
+          "instruction": "Look closely at the web address spelling and the request for a credit card.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User identifies the misspelled FedEx address phishing text."
+        },
+        {
+          "order": 4,
+          "scene": {
+            "type": "popup",
+            "sender": "Amazon Shopping App",
+            "senderDetail": "App Notification • Today 1:40 PM",
+            "content": "Your package containing 'Garden Gloves' is 8 stops away. Track driver in your Amazon app."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "legit",
+          "explanation": "This is a legitimate in-app notification from the Amazon app you installed on your phone, naming an item you ordered.",
+          "warningSigns": ["Comes directly from the installed shopping app", "Names actual item ordered", "No external website links or fee requests"],
+          "safeAction": "You can watch the driver's progress inside the app.",
+          "instruction": "Notice this comes directly from your installed shopping app.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User confirms the Amazon in-app delivery notice is legitimate."
+        },
+        {
+          "order": 5,
+          "scene": {
+            "type": "sms",
+            "sender": "12 (16) 555-0132",
+            "senderDetail": "Text Message • Today 5:15 PM",
+            "content": "DHL Express: International shipment held at customs. A duty fee of $3.50 is unpaid. Pay now at dhl-customs-clearance.top or package will be destroyed."
+          },
+          "question": "Is this a legit message or a scam?",
+          "options": [
+            { "id": "legit", "label": "A. Legit" },
+            { "id": "scam", "label": "B. Scam" }
+          ],
+          "correctAnswer": "scam",
+          "explanation": "Scammers invent fake customs fees and threaten to destroy packages to panic people into submitting card information.",
+          "warningSigns": ["Threat to destroy package", "Unexpected international shipment", "Suspicious .top website"],
+          "safeAction": "Do not pay. Delete the message.",
+          "instruction": "Notice the threat to destroy a package you never ordered.",
+          "checkQuestion": "Is this a legit message or a scam?",
+          "successHint": "User catches the fake customs clearance fee scam."
+        }
+      ],
+      "finishTemplate": "Delivery message safety rule: I never pay surprise fees from a text message. I track packages inside the official shipper's app or website.",
+      "version": 2
+    }
+  ]
+}

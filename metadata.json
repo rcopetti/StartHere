@@ -1,0 +1,6 @@
+{
+  "name": "StartHere - Senior Tech Coach & Scam Protection",
+  "description": "Accessible, jargon-free technology coach and real-time scam protection with trusted family alerts for older adults.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
