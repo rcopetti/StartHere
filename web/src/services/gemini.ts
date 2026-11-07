@@ -13,7 +13,7 @@ const apiKey =
   (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) ||
   '';
 
-const ai = new GoogleGenAI(apiKey ? { apiKey } : {});
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 // Safety Interceptor: Regex for SSN, 13-16 digit cards, and passwords
 const SSN_REGEX = /\b\d{3}[- ]?\d{2}[- ]?\d{4}\b/;
@@ -120,6 +120,8 @@ Output JSON with schema:
   contents.push(promptText);
 
   try {
+    if (!ai) throw new Error('Gemini API key is not configured');
+
     const response = await ai.models.generateContent({
       model: 'gemini-3.8-flash',
       contents,
@@ -155,7 +157,9 @@ Output JSON with schema:
       createdAt: Date.now(),
     };
   } catch (err) {
-    console.warn('Scam check AI call failed, falling back to deterministic heuristic:', err);
+    if (ai) {
+      console.warn('Scam check AI call failed, falling back to deterministic heuristic:', err);
+    }
 
     // Safe fallback (fail-closed heuristic)
     const lower = rawText.toLowerCase();
@@ -208,6 +212,8 @@ RULES:
 4. If they ask about money or medicine, advise them to check with a real expert.`;
 
   try {
+    if (!ai) throw new Error('Gemini API key is not configured');
+
     const res = await ai.models.generateContent({
       model: 'gemini-3.8-flash',
       contents: question,
