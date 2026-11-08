@@ -5,12 +5,15 @@
 
 import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { ROUTES } from '../navigation/routes';
 
 export const ScamCheckScreen: React.FC = () => {
-  const { setScreen, runScamCheck, fontSize, highContrast } = useApp();
+  const { runScamCheck, fontSize, highContrast } = useApp();
+  const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageMime, setImageMime] = useState<string>('image/jpeg');
@@ -37,6 +40,7 @@ export const ScamCheckScreen: React.FC = () => {
         imageBase64: imagePreview ? imagePreview.split(',')[1] || imagePreview : undefined,
         imageMime,
       });
+      navigate(ROUTES.checkResult);
     } catch (err) {
       console.error('Check failed:', err);
     } finally {
@@ -73,12 +77,12 @@ export const ScamCheckScreen: React.FC = () => {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
         title="🛡️ Scam Check"
         showBack
-        onBack={() => setScreen('home')}
-        showSettings
+        onBack={() => navigate(ROUTES.home)}
+        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -135,7 +139,7 @@ export const ScamCheckScreen: React.FC = () => {
               {
                 fontSize: getBodySize(),
                 color: highContrast ? '#FFFFFF' : '#0F172A',
-                backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                 borderColor: highContrast ? '#FFFFFF' : '#CBD5E1',
               },
             ]}

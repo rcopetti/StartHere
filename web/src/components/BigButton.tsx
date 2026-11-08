@@ -12,7 +12,7 @@ interface BigButtonProps {
   label: string;
   sublabel?: string;
   onPress: () => void;
-  variant?: 'primary' | 'danger' | 'secondary' | 'success' | 'outline';
+  variant?: 'primary' | 'navy' | 'danger' | 'secondary' | 'success' | 'outline';
   icon?: React.ReactNode;
   disabled?: boolean;
   minHeight?: number;
@@ -52,6 +52,8 @@ export const BigButton: React.FC<BigButtonProps> = ({
         return pressed ? '#E2E8F0' : '#F1F5F9';
       case 'outline':
         return pressed ? '#F8FAFC' : '#FFFFFF';
+      case 'navy':
+        return pressed ? '#0F2539' : '#18334D';
       case 'primary':
       default:
         return pressed ? '#1D4ED8' : '#2563EB';

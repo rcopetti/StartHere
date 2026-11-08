@@ -12,7 +12,6 @@ import type {
   LessonStep,
   ScenarioAnswer,
   ScamCheckResult,
-  ScreenId,
   FontSizePreference,
   UserRole,
 } from '../types';
@@ -33,7 +32,6 @@ import { analyzeScamCheck } from '../services/gemini';
 interface AppContextType {
   user: UserProfile | null;
   loading: boolean;
-  currentScreen: ScreenId;
   allLessons: LessonDocument[];
   activeLesson: LessonDocument | null;
   activeStepIndex: number;
@@ -48,14 +46,13 @@ interface AppContextType {
   role: UserRole;
   isScenarioAnswered: boolean;
   // Actions
-  setScreen: (screen: ScreenId) => void;
   setFontSize: (size: FontSizePreference) => void;
   setHighContrast: (enabled: boolean) => void;
   setRole: (role: UserRole) => void;
   toggleAutoAlert: (enabled: boolean) => void;
   startLesson: (lesson: LessonDocument) => void;
   answerScenario: (selectedAnswer: 'legit' | 'scam') => void;
-  nextScenario: () => void;
+  nextScenario: () => boolean;
   exitLesson: () => void;
   runScamCheck: (input: { text?: string; imageBase64?: string; imageMime?: string }) => Promise<ScamCheckResult>;
   triggerEmergencyHelp: () => Promise<void>;
@@ -68,7 +65,6 @@ const AppContext = createContext<AppContextType | null>(null);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentScreen, setCurrentScreen] = useState<ScreenId>('onboarding');
   const [allLessons, setAllLessons] = useState<LessonDocument[]>([]);
   const [activeLesson, setActiveLesson] = useState<LessonDocument | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
@@ -93,11 +89,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         const { profile } = await initAuthAndProfile();
         setUser(profile);
-
-        // If previously configured, jump straight to home
-        if (profile.displayName) {
-          setCurrentScreen(profile.role === 'family' ? 'family-portal' : 'home');
-        }
 
         const lessons = await seedLessonsIfEmpty();
         setAllLessons(lessons);
@@ -125,10 +116,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, []);
 
-  const setScreen = (screen: ScreenId) => {
-    setCurrentScreen(screen);
-  };
-
   const setFontSize = (size: FontSizePreference) => {
     if (!user) return;
     setUser({ ...user, fontSizePreference: size });
@@ -145,7 +132,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!user) return;
     setUser({ ...user, role: newRole });
     updateUserProfile(user.uid, { role: newRole });
-    setCurrentScreen(newRole === 'family' ? 'family-portal' : 'home');
   };
 
   const toggleAutoAlert = (enabled: boolean) => {
@@ -160,7 +146,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setScenarioAnswers([]);
     setLatestAnswer(null);
     setIsScenarioAnswered(false);
-    setCurrentScreen('scenario');
   };
 
   const currentStep: LessonStep | null =
@@ -186,34 +171,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsScenarioAnswered(true);
   };
 
-  const nextScenario = () => {
-    if (!activeLesson) return;
+  const nextScenario = (): boolean => {
+    if (!activeLesson) return false;
 
     const nextIndex = activeStepIndex + 1;
     if (nextIndex < activeLesson.steps.length) {
       setActiveStepIndex(nextIndex);
       setIsScenarioAnswered(false);
       setLatestAnswer(null);
-    } else {
-      // Finished all scenarios in this lesson
-      const score = scenarioAnswers.filter((a) => a.isCorrect).length;
-      if (user) {
-        saveCoachSession({
-          id: `session-${Date.now()}`,
-          seniorUid: user.uid,
-          lessonId: activeLesson.lessonId,
-          lessonTitle: activeLesson.title,
-          currentStep: activeLesson.steps.length,
-          totalSteps: activeLesson.steps.length,
-          status: 'completed',
-          scenarioAnswers,
-          score,
-          startedAt: Date.now() - 120000,
-          completedAt: Date.now(),
-        });
-      }
-      setCurrentScreen('lesson-complete');
+      return false;
     }
+
+    // Finished all scenarios in this lesson
+    const score = scenarioAnswers.filter((a) => a.isCorrect).length;
+    if (user) {
+      saveCoachSession({
+        id: `session-${Date.now()}`,
+        seniorUid: user.uid,
+        lessonId: activeLesson.lessonId,
+        lessonTitle: activeLesson.title,
+        currentStep: activeLesson.steps.length,
+        totalSteps: activeLesson.steps.length,
+        status: 'completed',
+        scenarioAnswers,
+        score,
+        startedAt: Date.now() - 120000,
+        completedAt: Date.now(),
+      });
+    }
+    return true;
   };
 
   const exitLesson = () => {
@@ -221,7 +207,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveStepIndex(0);
     setIsScenarioAnswered(false);
     setLatestAnswer(null);
-    setCurrentScreen('catalog');
   };
 
   const runScamCheck = async (input: { text?: string; imageBase64?: string; imageMime?: string }) => {
@@ -245,7 +230,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
 
-    setCurrentScreen('scam-verdict');
     return result;
   };
 
@@ -275,7 +259,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         user,
         loading,
-        currentScreen,
         allLessons,
         activeLesson,
         activeStepIndex,
@@ -289,7 +272,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         highContrast,
         role,
         isScenarioAnswered,
-        setScreen,
         setFontSize,
         setHighContrast,
         setRole,

@@ -5,12 +5,15 @@
 
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TextInput, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { ROUTES } from '../navigation/routes';
 
 export const FamilyCircleScreen: React.FC = () => {
-  const { trustedContacts, triggerEmergencyHelp, inviteFamilyMember, setScreen, fontSize, highContrast } = useApp();
+  const { trustedContacts, triggerEmergencyHelp, inviteFamilyMember, fontSize, highContrast } = useApp();
+  const navigate = useNavigate();
   const [helpSent, setHelpSent] = useState(false);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteName, setInviteName] = useState('');
@@ -47,12 +50,12 @@ export const FamilyCircleScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
         title="👨‍👩‍👧 Family Circle"
         showBack
-        onBack={() => setScreen('home')}
-        showSettings
+        onBack={() => navigate(ROUTES.home)}
+        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -176,7 +179,7 @@ export const FamilyCircleScreen: React.FC = () => {
                   {
                     fontSize: getBodySize() - 1,
                     color: highContrast ? '#FFFFFF' : '#0F172A',
-                    backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                    backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                     borderColor: '#CBD5E1',
                   },
                 ]}
@@ -192,7 +195,7 @@ export const FamilyCircleScreen: React.FC = () => {
                   {
                     fontSize: getBodySize() - 1,
                     color: highContrast ? '#FFFFFF' : '#0F172A',
-                    backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                    backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                     borderColor: '#CBD5E1',
                   },
                 ]}
@@ -209,7 +212,7 @@ export const FamilyCircleScreen: React.FC = () => {
                   {
                     fontSize: getBodySize() - 1,
                     color: highContrast ? '#FFFFFF' : '#0F172A',
-                    backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                    backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                     borderColor: '#CBD5E1',
                   },
                 ]}

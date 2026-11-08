@@ -5,9 +5,11 @@
 
 import React from 'react';
 import { View, Text, ScrollView, Pressable, Switch, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { ROUTES } from '../navigation/routes';
 import type { FontSizePreference } from '../types';
 
 export const SettingsScreen: React.FC = () => {
@@ -20,8 +22,8 @@ export const SettingsScreen: React.FC = () => {
     toggleAutoAlert,
     role,
     setRole,
-    setScreen,
   } = useApp();
+  const navigate = useNavigate();
 
   const fontOptions: Array<{ id: FontSizePreference; label: string }> = [
     { id: 'standard', label: 'Standard Text (18px)' },
@@ -30,11 +32,11 @@ export const SettingsScreen: React.FC = () => {
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
         title="⚙️ Settings"
         showBack
-        onBack={() => setScreen(role === 'family' ? 'family-portal' : 'home')}
+        onBack={() => navigate(role === 'family' ? ROUTES.familyPortal : ROUTES.home)}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

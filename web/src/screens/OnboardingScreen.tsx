@@ -5,12 +5,15 @@
 
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { BigButton } from '../components/BigButton';
+import { ROUTES } from '../navigation/routes';
 import type { FontSizePreference } from '../types';
 
 export const OnboardingScreen: React.FC = () => {
-  const { fontSize, setFontSize, role, setRole, setScreen, highContrast } = useApp();
+  const { fontSize, setFontSize, role, setRole, highContrast } = useApp();
+  const navigate = useNavigate();
 
   const getBodySize = () => {
     switch (fontSize) {
@@ -34,7 +37,7 @@ export const OnboardingScreen: React.FC = () => {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: highContrast ? '#000000' : '#F8FAFC' },
+        { backgroundColor: highContrast ? '#000000' : '#FAF8F5' },
       ]}
       contentContainerStyle={styles.contentContainer}
     >
@@ -198,7 +201,7 @@ export const OnboardingScreen: React.FC = () => {
         <BigButton
           label="GET STARTED  ➔"
           variant="primary"
-          onPress={() => setScreen(role === 'family' ? 'family-portal' : 'home')}
+          onPress={() => navigate(role === 'family' ? ROUTES.familyPortal : ROUTES.home)}
           minHeight={58}
         />
       </View>
@@ -289,7 +292,7 @@ const styles = StyleSheet.create({
   previewBox: {
     marginTop: 10,
     padding: 14,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',

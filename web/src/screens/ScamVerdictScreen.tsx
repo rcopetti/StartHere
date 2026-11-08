@@ -5,17 +5,20 @@
 
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
 import { VerdictBanner } from '../components/VerdictBanner';
+import { ROUTES } from '../navigation/routes';
 
 export const ScamVerdictScreen: React.FC = () => {
-  const { activeScamResult, setScreen, fontSize, highContrast, triggerEmergencyHelp } = useApp();
+  const { activeScamResult, fontSize, highContrast, triggerEmergencyHelp } = useApp();
   const [alertSent, setAlertSent] = useState(false);
+  const navigate = useNavigate();
 
   if (!activeScamResult) {
-    return null;
+    return <Navigate to={ROUTES.check} replace />;
   }
 
   const getBodySize = () => {
@@ -36,11 +39,11 @@ export const ScamVerdictScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
         title="🛡️ Scam Result"
         showBack
-        onBack={() => setScreen('scam-check')}
+        onBack={() => navigate(ROUTES.check)}
         showSettings
       />
 
@@ -159,7 +162,7 @@ export const ScamVerdictScreen: React.FC = () => {
                 <BigButton
                   label="🗑️ I DELETED THE MESSAGE — ALL SET"
                   variant="success"
-                  onPress={() => setScreen('home')}
+                  onPress={() => navigate(ROUTES.home)}
                   minHeight={52}
                 />
               </View>
@@ -178,7 +181,7 @@ export const ScamVerdictScreen: React.FC = () => {
                 <BigButton
                   label="BACK TO HOME SCREEN"
                   variant="outline"
-                  onPress={() => setScreen('home')}
+                  onPress={() => navigate(ROUTES.home)}
                   minHeight={52}
                 />
               </View>
@@ -189,7 +192,7 @@ export const ScamVerdictScreen: React.FC = () => {
             <BigButton
               label="BACK TO HOME SCREEN"
               variant="primary"
-              onPress={() => setScreen('home')}
+              onPress={() => navigate(ROUTES.home)}
               minHeight={56}
             />
           )}

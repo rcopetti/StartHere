@@ -17,7 +17,7 @@ declare module 'react-native' {
     disabled?: boolean;
     accessibilityRole?: string;
     accessibilityLabel?: string;
-    accessibilityState?: { selected?: boolean };
+    accessibilityState?: { selected?: boolean; expanded?: boolean; disabled?: boolean };
     style?: any;
     children?: React.ReactNode | ((state: { pressed: boolean }) => React.ReactNode);
   }
@@ -27,6 +27,7 @@ declare module 'react-native' {
     style?: any;
     accessibilityRole?: string;
     accessibilityLabel?: string;
+    accessibilityViewIsModal?: boolean;
     children?: React.ReactNode;
   }
   export const View: React.FC<ViewProps>;
@@ -71,7 +72,17 @@ declare module 'react-native' {
   }
   export const ActivityIndicator: React.FC<ActivityIndicatorProps>;
 
+  export interface ModalProps {
+    visible?: boolean;
+    transparent?: boolean;
+    animationType?: 'none' | 'slide' | 'fade';
+    onRequestClose?: () => void;
+    children?: React.ReactNode;
+  }
+  export const Modal: React.FC<ModalProps>;
+
   export const StyleSheet: {
     create<T extends Record<string, any>>(styles: T): T;
+    absoluteFill: any;
   };
 }

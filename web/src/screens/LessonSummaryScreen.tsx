@@ -5,12 +5,19 @@
 
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { ROUTES } from '../navigation/routes';
 
 export const LessonSummaryScreen: React.FC = () => {
-  const { user, activeLesson, scenarioAnswers, setScreen, fontSize, highContrast } = useApp();
+  const { user, activeLesson, scenarioAnswers, fontSize, highContrast } = useApp();
+  const navigate = useNavigate();
+
+  if (!activeLesson) {
+    return <Navigate to={ROUTES.coach} replace />;
+  }
 
   const getBodySize = () => {
     switch (fontSize) {
@@ -29,7 +36,7 @@ export const LessonSummaryScreen: React.FC = () => {
   const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'Eleanor';
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader title="Lesson Completed!" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -125,7 +132,7 @@ export const LessonSummaryScreen: React.FC = () => {
           <BigButton
             label="PRACTICE ANOTHER TOPIC  ➔"
             variant="primary"
-            onPress={() => setScreen('catalog')}
+            onPress={() => navigate(ROUTES.coach)}
             minHeight={56}
           />
 
@@ -133,7 +140,7 @@ export const LessonSummaryScreen: React.FC = () => {
             <BigButton
               label="RETURN TO HOME SCREEN"
               variant="outline"
-              onPress={() => setScreen('home')}
+              onPress={() => navigate(ROUTES.home)}
               minHeight={52}
             />
           </View>

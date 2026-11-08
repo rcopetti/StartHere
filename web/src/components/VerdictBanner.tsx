@@ -13,23 +13,23 @@ interface VerdictBannerProps {
   riskScore?: number;
 }
 
-export const VerdictBanner: React.FC<VerdictBannerProps> = ({ verdict, riskScore }) => {
+export const VerdictBanner: React.FC<VerdictBannerProps> = ({ verdict }) => {
   const { highContrast } = useApp();
 
   const getDetails = () => {
     switch (verdict) {
       case 'likely_scam':
         return {
-          title: '⛔ STOP — THIS LOOKS LIKE A SCAM',
-          subtext: riskScore ? `Risk Rating: High (${riskScore}% Suspicious)` : 'High Risk Fraud Detected',
+          title: '⛔ This is a scam',
+          subtext: 'You did the right thing by checking.',
           bgColor: highContrast ? '#7F1D1D' : '#FEE2E2',
           textColor: highContrast ? '#FFFFFF' : '#991B1B',
           borderColor: '#EF4444',
         };
       case 'caution':
         return {
-          title: '⚠️ CAUTION — PROCEED CAREFULLY',
-          subtext: riskScore ? `Risk Rating: Medium (${riskScore}% Suspicious)` : 'Unverified Sender Notice',
+          title: '⚠️ Be careful with this one',
+          subtext: 'Let’s check it another way before you reply.',
           bgColor: highContrast ? '#78350F' : '#FEF3C7',
           textColor: highContrast ? '#FFFFFF' : '#92400E',
           borderColor: '#F59E0B',
@@ -37,8 +37,8 @@ export const VerdictBanner: React.FC<VerdictBannerProps> = ({ verdict, riskScore
       case 'looks_safe':
       default:
         return {
-          title: '✅ LOOKS SAFE',
-          subtext: 'Standard Legitimate Communication',
+          title: '✅ This looks safe',
+          subtext: 'No warning signs were found.',
           bgColor: highContrast ? '#064E3B' : '#D1FAE5',
           textColor: highContrast ? '#FFFFFF' : '#065F46',
           borderColor: '#10B981',

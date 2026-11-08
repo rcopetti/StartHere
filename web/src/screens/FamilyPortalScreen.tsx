@@ -5,19 +5,22 @@
 
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { ROUTES } from '../navigation/routes';
 
 export const FamilyPortalScreen: React.FC = () => {
-  const { alerts, acknowledgeFamilyAlert, setRole, setScreen, highContrast } = useApp();
+  const { alerts, acknowledgeFamilyAlert, setRole, highContrast } = useApp();
+  const navigate = useNavigate();
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
         title="Family Portal"
         rightLabel="Sarah (Daughter)"
-        showSettings
+        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -144,7 +147,7 @@ export const FamilyPortalScreen: React.FC = () => {
             variant="outline"
             onPress={() => {
               setRole('senior');
-              setScreen('home');
+              navigate(ROUTES.home);
             }}
             minHeight={48}
           />
@@ -270,7 +273,7 @@ const styles = StyleSheet.create({
   alertStatusBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     padding: 10,
     borderRadius: 10,
     marginBottom: 14,
