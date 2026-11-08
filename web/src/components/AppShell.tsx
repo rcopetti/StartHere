@@ -23,6 +23,10 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
     backgroundColor: '#FAF8F5',
+    paddingTop: 'var(--safe-area-top)',
+    paddingRight: 'var(--safe-area-right)',
+    paddingBottom: 'var(--safe-area-bottom)',
+    paddingLeft: 'var(--safe-area-left)',
   },
   appColumn: {
     flex: 1,
