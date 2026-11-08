@@ -363,9 +363,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await sendFamilyAlert(
       user,
       'manual_help_request',
-      'Urgent: Eleanor tapped "Ask Family for Help"',
+      `Urgent: ${user.displayName} asked for help`,
       `${user.displayName} pressed the emergency help button and requests assistance right away.`,
-      'Please call Eleanor directly or verify she is safe.'
+      `Please call ${user.displayName} or check that they are safe.`
     );
   };
 
