@@ -27,8 +27,6 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  setPersistence,
-  browserLocalPersistence,
   Auth,
   User,
 } from 'firebase/auth';
@@ -42,6 +40,15 @@ import type {
 } from '../types';
 import lessonsData from '../../../foundation/starthere-dev-handoff/lessons.json';
 import { withoutUndefined } from './firestoreValues';
+import {
+  consumeRedirectPending,
+  firebaseErrorCode,
+  isIosStandalonePwa,
+  isSafariBrowser,
+  markRedirectPending,
+  popupFailureAction,
+  SignInFlowError,
+} from '../auth/signInFlow';
 
 // Configuration injected from the root .env file (see .env.example)
 const firebaseConfig = {
@@ -94,25 +101,67 @@ export function observeAuth(callback: (user: User | null) => void) {
   return onAuthStateChanged(auth, callback);
 }
 
-export async function completeGoogleRedirectSignIn(): Promise<void> {
+export interface RedirectSignInOutcome {
+  /** True only when this page load is the return leg of a redirect attempt. */
+  attempted: boolean;
+  user: User | null;
+  errorCode?: string;
+}
+
+export async function completeGoogleRedirectSignIn(): Promise<RedirectSignInOutcome> {
+  if (!consumeRedirectPending(getSessionStorage())) {
+    return { attempted: false, user: null };
+  }
+
   try {
-    await getRedirectResult(auth);
-  } catch {
-    // The auth listener surfaces the failure; nothing else to do here.
+    const credential = await getRedirectResult(auth);
+    return { attempted: true, user: credential?.user ?? null };
+  } catch (err) {
+    // Previously swallowed, which left iPhone readers on a blank sign-in
+    // screen when Safari's storage partitioning broke the redirect.
+    return { attempted: true, user: null, errorCode: firebaseErrorCode(err) };
   }
 }
 
 export async function signInWithGoogle(): Promise<void> {
-  await setPersistence(auth, browserLocalPersistence);
+  // Google blocks OAuth inside the iOS Home Screen webview, and that app does
+  // not share a session with Safari, so send the reader to Safari instead of
+  // looping through a redirect that cannot finish.
+  if (isIosStandalonePwa()) {
+    throw new SignInFlowError('auth/ios-standalone');
+  }
+
+  // browserLocalPersistence is already the web default. Awaiting
+  // setPersistence here writes to IndexedDB first and can use up Safari's
+  // user-gesture window, which makes signInWithPopup fail with
+  // auth/popup-blocked on iPhone.
   try {
     await signInWithPopup(auth, googleProvider);
   } catch (err) {
-    const code = (err as { code?: string }).code;
-    if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+    const code = firebaseErrorCode(err);
+    // On Safari the redirect flow returns no user because third-party storage
+    // is partitioned, so a second popup tap is the only path that can work.
+    const action = popupFailureAction(code, isSafariBrowser());
+
+    if (action === 'redirect') {
+      markRedirectPending(getSessionStorage());
       await signInWithRedirect(auth, googleProvider);
       return;
     }
+    if (action === 'open-in-safari') {
+      // In-app webviews cannot open a popup, and a redirect there loses its
+      // state the same way Safari does, so send the reader to Safari instead.
+      throw new SignInFlowError('auth/open-in-safari');
+    }
     throw err;
+  }
+}
+
+function getSessionStorage(): Storage | undefined {
+  try {
+    return typeof window === 'undefined' ? undefined : window.sessionStorage;
+  } catch {
+    return undefined;
   }
 }
 

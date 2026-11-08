@@ -76,13 +76,30 @@ Firebase web configuration lives in the repository-root `.env` file (see `.env.e
 firebase deploy --only firestore:rules --project starthere-3e5dc
 ```
 
+#### iPhone and iPad
+
+Google sign-in has three iOS-specific failure modes. The client detects them and
+shows plain-language guidance, but the setup still matters:
+
+- **Open the site in Safari, not the Home Screen icon.** Google blocks OAuth
+  inside the iOS standalone webview, and a Home Screen app does not share a
+  session with Safari anyway. The sign-in screen explains this when it detects
+  standalone mode.
+- **Allow pop-ups for the site.** Sign-in opens a Google window from a tap. If
+  Safari blocks it, tap the button again after allowing pop-ups; on Safari the
+  redirect fallback cannot finish because third-party storage is partitioned.
+- **Use an authorized address.** A plain LAN address such as
+  `http://192.168.1.20:3000` is not in Firebase's authorized domains, and Google
+  requires HTTPS for OAuth. Test from `localhost` on the Mac or from an HTTPS
+  tunnel whose host you added in step 3.
+
 The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-bde7-6558da3396b5`, so a `firebase.json` Firestore target that names the database is required for CLI deploys.
 
 ### Verify the app
 
 ```bash
 npm run lint
-node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/scamCheckFallback.test.ts web/src/services/scamCheckApi.test.ts
+node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/auth/signInFlow.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/scamCheckFallback.test.ts web/src/services/scamCheckApi.test.ts
 ```
 
 ### Scam Check API (FastAPI backend)

@@ -69,6 +69,15 @@ declare module 'react-native' {
   }
   export const TextInput: React.FC<TextInputProps>;
 
+  export interface ImageProps {
+    source?: { uri: string } | number;
+    style?: any;
+    alt?: string;
+    accessibilityLabel?: string;
+    resizeMode?: 'cover' | 'contain' | 'stretch' | 'repeat' | 'center';
+  }
+  export const Image: React.FC<ImageProps>;
+
   export interface SwitchProps {
     value?: boolean;
     onValueChange?: (val: boolean) => void;
