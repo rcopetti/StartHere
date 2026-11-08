@@ -6,6 +6,7 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     root: 'web',
+    envDir: path.resolve(__dirname),
     publicDir: path.resolve(__dirname, 'web/public'),
     plugins: [react(), tailwindcss()],
     resolve: {

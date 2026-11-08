@@ -59,9 +59,12 @@ Scam Check and Coach still run without an AI key and use their local fallback be
 
 StartHere signs people in with Google. Anonymous sessions and demo accounts are not used; every visitor must sign in before the app opens.
 
-1. Firebase Console → **Authentication** → **Sign-in method** → enable **Google**.
-2. Firebase Console → **Authentication** → **Settings** → **Authorized domains**: add `localhost`, the production host, and any tunnel host used for device testing.
-3. Deploy the hardened Firestore rules once the client is updated:
+Firebase web configuration lives in the repository-root `.env` file (see `.env.example`). Vite loads it because `vite.config.ts` sets `envDir` to the repository root, and only `VITE_`-prefixed values reach the browser bundle.
+
+1. Copy `.env.example` to `.env` and fill in the `VITE_FIREBASE_*` values from Firebase Console → **Project settings** → **Your apps**.
+2. Firebase Console → **Authentication** → **Sign-in method** → enable **Google**.
+3. Firebase Console → **Authentication** → **Settings** → **Authorized domains**: add `localhost`, the production host, and any tunnel host used for device testing.
+4. Deploy the hardened Firestore rules once the client is updated:
 
 ```bash
 firebase deploy --only firestore:rules --project starthere-3e5dc

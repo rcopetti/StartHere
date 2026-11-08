@@ -43,17 +43,28 @@ import type {
 import lessonsData from '../../../foundation/starthere-dev-handoff/lessons.json';
 import { withoutUndefined } from './firestoreValues';
 
-// Configuration injected by ProvisionFirebase
+// Configuration injected from the root .env file (see .env.example)
 const firebaseConfig = {
-  projectId: "starthere-3e5dc",
-  appId: "1:508232394857:web:dcdc07ce7bfec8fc4a5af8",
-  apiKey: "AIzaSyAbNeeGQ5h4eHHstNBz4Gx9JACGkuKo4GY",
-  authDomain: "starthere-3e5dc.firebaseapp.com",
-  firestoreDatabaseId: "ai-studio-starthereseniort-d5bbff61-0c13-49da-bde7-6558da3396b5",
-  storageBucket: "starthere-3e5dc.firebasestorage.app",
-  messagingSenderId: "508232394857",
-  oAuthClientId: "508232394857-35bbbirf0h6tuokre6u8oc4d5rjcktfe.apps.googleusercontent.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  oAuthClientId: import.meta.env.VITE_FIREBASE_OAUTH_CLIENT_ID,
 };
+
+const missingFirebaseSettings = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingFirebaseSettings.length > 0) {
+  throw new Error(
+    `Firebase configuration is missing: ${missingFirebaseSettings.join(', ')}. ` +
+      'Add the VITE_FIREBASE_* values to .env (see .env.example).'
+  );
+}
 
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId);
