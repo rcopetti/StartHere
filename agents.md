@@ -411,5 +411,6 @@ functions/                        # Backend Cloud Functions (Node.js/TypeScript)
 - **Type check**: `npm run lint`.
 - **Build**: `npm run build`.
 - **Route tests**: `node --import tsx --test web/src/navigation/routes.test.ts`.
+- **PWA tests**: `node --import tsx --test web/src/pwa.test.ts`.
 - **Gemini fallback test**: `node --import tsx --test web/src/services/gemini.test.ts`.
 
