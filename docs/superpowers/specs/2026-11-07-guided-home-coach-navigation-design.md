@@ -22,7 +22,7 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 
 **Interaction model:** A guided home hub, a filterable vertical session list, and one quiz question at a time.
 
-**Responsive priority:** Design first for a narrow phone viewport. Keep the primary action full width, let category filters wrap, and allow lesson cards and text to grow without clipping.
+**Responsive priority:** Design first for a narrow phone viewport, but render the app directly in the page at every size. Do not wrap the interface in a simulated phone frame, bezel, notch, status bar, or home indicator. Let content adapt naturally to wider desktop viewports.
 
 **References and transferable patterns:**
 - User-provided property-app image: raised rounded surfaces, obvious categories, short metadata, and icon navigation. Adapt these into safety and lesson cards; do not copy property imagery or compact text.
@@ -31,13 +31,14 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 
 **Forbidden defaults:** No separate AI chat masquerading as Coach; no separate Learn tab; no swipe-only interaction; no tiny icon-only navigation; no competing primary actions on Home; no alarmist or color-only safety states.
 
-**Finish evidence:** Verify Home and Coach at 320–390 CSS px and desktop device-preview sizes; check keyboard and accessible labels; verify loading/empty states, tab routing, lesson launch, question answer, progress, and return navigation; confirm text remains visible at 200% scaling.
+**Finish evidence:** Verify Home and Coach at 320–390 CSS px and 1024–1440 CSS px; confirm the app fills the page without a simulated phone frame. Check keyboard and accessible labels; verify loading/empty states, tab routing, lesson launch, question answer, progress, and return navigation; confirm text remains visible at 200% scaling.
 
 ## Approved Screen Design
 
 ### Home
 
 - Use the guided-home Option B composition shown in the visual companion.
+- Render the app directly in the responsive page. Remove the desktop-only simulated phone bezel, notch/status-bar strip, and home-indicator strip; do not add another device frame around any screen.
 - Use a warm off-white background, layered white surfaces with restrained shadows, dark navy for the main action, and green only with a check icon and clear status wording.
 - Show a short greeting such as “You have support, Eleanor.” Use the signed-in first name when available and a neutral fallback when it is not.
 - Show one primary, full-width `Check something` button. It opens the existing Scam Check screen.
@@ -108,6 +109,6 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 1. Run the TypeScript check and production build.
 2. Verify Home → Check, Home session preview → Coach session, Coach session → quiz, and Back/Close navigation.
 3. Verify category filters, loading state, empty session list, no trusted contact, quiz feedback, and progress display.
-4. Check the narrow phone layout and desktop device preview; confirm labels wrap and no controls are clipped.
+4. Check the narrow phone layout and full-page desktop layout at 1024–1440 CSS px; confirm there is no simulated phone frame, labels wrap, and no controls are clipped.
 5. Check tap target size, keyboard navigation, visible focus, accessible names, high contrast, and 200% text scaling.
 6. Confirm the app remains usable with local lessons when remote lesson data is unavailable.
