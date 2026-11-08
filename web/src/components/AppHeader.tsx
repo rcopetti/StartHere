@@ -7,7 +7,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Pressable, StyleSheet, Modal, useWindowDimensions } from 'react-native';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Settings, UserRound, Users, X } from 'lucide-react';
+import { ChevronLeft, LogOut, Settings, UserRound, Users, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ROUTES } from '../navigation/routes';
 import { Heading } from './Heading';
@@ -18,6 +18,7 @@ interface AppHeaderProps {
   onBack?: () => void;
   showSettings?: boolean;
   showPersonMenu?: boolean;
+  showSignOut?: boolean;
   showClose?: boolean;
   onClose?: () => void;
   rightLabel?: string;
@@ -29,14 +30,17 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onBack,
   showSettings = false,
   showPersonMenu = false,
+  showSignOut = false,
   showClose = false,
   onClose,
   rightLabel,
 }) => {
-  const { fontSize, highContrast } = useApp();
+  const { fontSize, highContrast, signOutUser } = useApp();
   const { width } = useWindowDimensions();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutFailed, setSignOutFailed] = useState(false);
   const isNarrow = width < 360;
 
   const getTitleSize = () => {
@@ -52,6 +56,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   const foreground = highContrast ? '#FFFFFF' : '#17212B';
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    setSignOutFailed(false);
+    try {
+      await signOutUser();
+    } catch {
+      setSignOutFailed(true);
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     typeof window.matchMedia === 'function' &&
@@ -110,7 +126,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             </View>
           )}
 
-          <View style={[styles.rightSlot, isNarrow && styles.rightSlotNarrow]}>
+          <View style={[styles.rightSlot, isNarrow && styles.rightSlotNarrow, showSignOut && styles.accountActions]}>
             {showSettings && (
               <Pressable
                 onPress={() => navigate(ROUTES.settings)}
@@ -159,6 +175,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               </Pressable>
             )}
 
+            {showSignOut && (
+              <Pressable
+                onPress={handleSignOut}
+                disabled={signingOut}
+                accessibilityRole="button"
+                accessibilityLabel="Sign out"
+                style={styles.navButton}
+              >
+                <LogOut size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
+              </Pressable>
+            )}
+
             {rightLabel && (
               <Text style={[styles.rightLabelText, { color: foreground }]}>{rightLabel}</Text>
             )}
@@ -166,6 +194,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         </View>
 
         {isNarrow && <Text style={[styles.narrowTitle, titleStyle]}>{title}</Text>}
+        {signOutFailed && (
+          <Text role="alert" style={{ color: foreground }}>Couldn’t sign out. Please try again.</Text>
+        )}
       </View>
 
       <Modal
@@ -283,6 +314,10 @@ const styles = StyleSheet.create({
   },
   rightSlotNarrow: {
     minWidth: 0,
+  },
+  accountActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   navButton: {
     minHeight: 64,
