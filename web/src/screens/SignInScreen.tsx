@@ -4,7 +4,7 @@
  * reassures the senior that no password, card, or number is ever requested.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
@@ -17,6 +17,7 @@ export const SignInScreen: React.FC = () => {
   const { authStage, authError, signInWithGoogle, fontSize, highContrast } = useApp();
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from;
+  const [pending, setPending] = useState(false);
 
   if (authStage === 'ready') {
     return <Navigate to={from && from !== ROUTES.signIn ? from : ROUTES.home} replace />;
@@ -69,13 +70,14 @@ export const SignInScreen: React.FC = () => {
         )}
 
         <BigButton
-          label={authStage === 'loading' ? 'Getting things ready…' : 'Sign in with Google'}
+          label={pending ? 'Opening Google…' : 'Sign in with Google'}
           sublabel="Uses your Google account"
           variant="navy"
           onPress={() => {
-            void signInWithGoogle();
+            setPending(true);
+            void signInWithGoogle().finally(() => setPending(false));
           }}
-          disabled={authStage === 'loading'}
+          disabled={pending || authStage === 'loading'}
           minHeight={68}
         />
 
