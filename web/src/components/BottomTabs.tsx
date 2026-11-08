@@ -1,19 +1,20 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { GraduationCap, House, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { ROUTES, activeTabForPath, type AppTab } from '../navigation/routes';
 
 interface TabDefinition {
   id: AppTab;
   label: string;
-  icon: string;
+  icon: LucideIcon;
   path: string;
 }
 
 const TABS: TabDefinition[] = [
-  { id: 'home', label: 'Home', icon: '⌂', path: ROUTES.home },
-  { id: 'check', label: 'Check', icon: '▣', path: ROUTES.check },
-  { id: 'coach', label: 'Coach', icon: '▤', path: ROUTES.coach },
+  { id: 'home', label: 'Home', icon: House, path: ROUTES.home },
+  { id: 'check', label: 'Check', icon: ShieldCheck, path: ROUTES.check },
+  { id: 'coach', label: 'Coach', icon: GraduationCap, path: ROUTES.coach },
 ];
 
 export const BottomTabs: React.FC = () => {
@@ -25,6 +26,7 @@ export const BottomTabs: React.FC = () => {
     <View style={styles.container} accessibilityRole="tablist">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
+        const Icon = tab.icon;
 
         return (
           <Pressable
@@ -40,7 +42,15 @@ export const BottomTabs: React.FC = () => {
             ]}
           >
             <View style={[styles.selectedMarker, isActive && styles.selectedMarkerVisible]} />
-            <Text style={[styles.icon, isActive && styles.activeText]}>{tab.icon}</Text>
+            <View style={styles.iconWrap}>
+              <Icon
+                size={25}
+                strokeWidth={isActive ? 2.6 : 2.2}
+                color={isActive ? '#183E2A' : '#435159'}
+                aria-hidden="true"
+                focusable="false"
+              />
+            </View>
             <Text style={[styles.label, isActive && styles.activeText]}>{tab.label}</Text>
           </Pressable>
         );
@@ -80,10 +90,10 @@ const styles = StyleSheet.create({
   selectedMarkerVisible: {
     backgroundColor: '#1E5E3A',
   },
-  icon: {
-    fontSize: 23,
-    lineHeight: 26,
-    color: '#435159',
+  iconWrap: {
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   label: {
     marginTop: 2,

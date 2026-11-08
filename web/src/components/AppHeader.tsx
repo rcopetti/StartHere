@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Modal } from 'react-native';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, Settings, UserRound, Users, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ROUTES } from '../navigation/routes';
 
@@ -76,7 +77,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 { opacity: pressed ? 0.7 : 1 },
               ]}
             >
-              <Text style={[styles.navButtonText, { color: foreground }]}>‹ Back</Text>
+              <ChevronLeft size={24} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
+              <Text style={[styles.navButtonText, { color: foreground }]}>Back</Text>
             </Pressable>
           )}
         </View>
@@ -108,7 +110,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 { opacity: pressed ? 0.7 : 1 },
               ]}
             >
-              <Text style={[styles.navButtonText, { color: foreground }]}>⚙️ Aa</Text>
+              <Settings size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
+              <Text style={[styles.navButtonText, { color: foreground }]}>Aa</Text>
             </Pressable>
           )}
 
@@ -126,7 +129,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 },
               ]}
             >
-              <Text style={styles.personIcon}>👤</Text>
+              <UserRound size={24} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
               <Text style={[styles.personLabel, { color: foreground }]}>Family</Text>
             </Pressable>
           )}
@@ -141,7 +144,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 { opacity: pressed ? 0.7 : 1 },
               ]}
             >
-              <Text style={[styles.closeButtonText, { color: foreground }]}>✕</Text>
+              <X size={26} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
             </Pressable>
           )}
 
@@ -183,7 +186,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 { borderColor: highContrast ? '#FFFFFF' : '#D9DFDA', opacity: pressed ? 0.75 : 1 },
               ]}
             >
-              <Text style={styles.menuIcon}>👨‍👩‍👧</Text>
+              <View style={styles.menuIconWrap}>
+                <Users size={28} strokeWidth={2.2} color={foreground} aria-hidden="true" focusable="false" />
+              </View>
               <View style={styles.menuTextBlock}>
                 <Text style={[styles.menuItemTitle, { color: foreground }]}>Family Circle</Text>
                 <Text style={styles.menuItemSubtitle}>People you trust</Text>
@@ -198,7 +203,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 { borderColor: highContrast ? '#FFFFFF' : '#D9DFDA', opacity: pressed ? 0.75 : 1 },
               ]}
             >
-              <Text style={styles.menuIcon}>⚙️</Text>
+              <View style={styles.menuIconWrap}>
+                <Settings size={28} strokeWidth={2.2} color={foreground} aria-hidden="true" focusable="false" />
+              </View>
               <View style={styles.menuTextBlock}>
                 <Text style={[styles.menuItemTitle, { color: foreground }]}>Settings</Text>
                 <Text style={styles.menuItemSubtitle}>Text size and contrast</Text>
@@ -249,6 +256,8 @@ const styles = StyleSheet.create({
   navButton: {
     minHeight: 64,
     minWidth: 64,
+    flexDirection: 'row',
+    gap: 4,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 8,
@@ -271,9 +280,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 14,
   },
-  personIcon: {
-    fontSize: 22,
-  },
   personLabel: {
     fontSize: 13,
     fontWeight: '700',
@@ -283,10 +289,6 @@ const styles = StyleSheet.create({
     minWidth: 64,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  closeButtonText: {
-    fontSize: 24,
-    fontWeight: '800',
   },
   rightLabelText: {
     fontSize: 15,
@@ -321,8 +323,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 18,
   },
-  menuIcon: {
-    fontSize: 28,
+  menuIconWrap: {
+    width: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   menuTextBlock: {
     flex: 1,
