@@ -6,7 +6,7 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     root: 'web',
-    publicDir: path.resolve(__dirname, 'public'),
+    publicDir: path.resolve(__dirname, 'web/public'),
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -24,6 +24,7 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      allowedHosts: ['localhost', '127.0.0.1', 'carless-almost-brought.ngrok-free.dev'],
     },
   };
 });
