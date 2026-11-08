@@ -58,6 +58,7 @@ declare module 'react-native' {
 
   export interface TextInputProps {
     style?: any;
+    accessibilityLabel?: string;
     value?: string;
     onChangeText?: (text: string) => void;
     placeholder?: string;
