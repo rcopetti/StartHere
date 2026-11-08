@@ -3,7 +3,7 @@
  * Manages user profile, dynamic font scaling, high contrast, active scenario turns, and Firebase sync.
  */
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type {
   UserProfile,
   TrustedContact,
@@ -43,6 +43,7 @@ import {
   type ScamCheckInput,
 } from '../services/scamCheckApi';
 import { resolveAuthStage, type AuthStage } from '../auth/authState';
+import { firebaseErrorCode, signInErrorMessage } from '../auth/signInFlow';
 
 /**
  * The FastAPI service is the primary check path so model choice and provider
@@ -107,24 +108,13 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-function signInErrorMessage(code?: string): string {
-  switch (code) {
-    case 'auth/popup-closed-by-user':
-      return 'The sign-in window closed before you finished. Nothing was shared. Tap the button to try again.';
-    case 'auth/popup-blocked':
-      return 'Your browser stopped the sign-in window. Tap the green button again.';
-    case 'auth/unauthorized-domain':
-    case 'auth/operation-not-allowed':
-      return "Sign-in isn't set up on this address yet. Please ask Mark for help.";
-    default:
-      return "We couldn't sign you in just now. Nothing was shared. Please try again.";
-  }
-}
-
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [authStage, setAuthStage] = useState<AuthStage>('loading');
   const [authError, setAuthError] = useState<string | null>(null);
+  // Kept in a ref so the auth listener can show a redirect failure no matter
+  // which resolves first: the listener or getRedirectResult.
+  const redirectErrorRef = useRef<string | null>(null);
   const [allLessons, setAllLessons] = useState<LessonDocument[]>([]);
   const [activeLesson, setActiveLesson] = useState<LessonDocument | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
@@ -147,18 +137,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     let cancelled = false;
 
-    void completeGoogleRedirectSignIn();
+    void completeGoogleRedirectSignIn().then((outcome) => {
+      if (cancelled || !outcome.attempted || outcome.user || auth.currentUser) return;
+      const message = signInErrorMessage(outcome.errorCode ?? 'auth/redirect-no-result');
+      redirectErrorRef.current = message;
+      setAuthError(message);
+      setAuthStage('signed_out');
+    });
 
     const unsubscribeAuth = observeAuth(async (fbUser) => {
       if (cancelled) return;
 
       if (!fbUser) {
         setUser(null);
-        setAuthError(null);
+        setAuthError(redirectErrorRef.current);
         setAuthStage('signed_out');
         return;
       }
 
+      redirectErrorRef.current = null;
       setAuthStage('loading');
       setAuthError(null);
 
@@ -224,13 +221,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [authStage, user?.uid]);
 
   const signInWithGoogle = async () => {
+    redirectErrorRef.current = null;
     setAuthError(null);
     try {
       await signInWithGoogleService();
     } catch (err) {
-      const code = (err as { code?: string }).code;
+      const code = firebaseErrorCode(err);
       if (code === 'auth/cancelled-popup-request') return;
-      console.warn('Google sign-in did not complete:', code);
+      if (import.meta.env.DEV) {
+        console.warn('Google sign-in did not complete:', code, window.location.host);
+      }
       setAuthError(signInErrorMessage(code));
     }
   };
