@@ -73,7 +73,9 @@ LLM_TIMEOUT_SECONDS=60
 ```
 
 Local models are slower and less accurate. Keep `LLM_TIMEOUT_SECONDS` generous
-and use a vision-capable model if you need photo checks.
+and use a vision-capable model if you need photo checks. Reasoning-capable
+models spend tokens before writing the JSON reply, so keep
+`LLM_MAX_TOKENS` at 1200 or higher for those.
 
 ---
 
@@ -206,7 +208,7 @@ Errors use one envelope:
 | `LLM_API_KEY` / `LLM_API_BASE` | empty | Overrides for providers that need them |
 | `LLM_TIMEOUT_SECONDS` | `20` | Per-call timeout |
 | `LLM_TEMPERATURE` | `0.1` | Deterministic verdicts |
-| `LLM_MAX_TOKENS` | `700` | Reply budget |
+| `LLM_MAX_TOKENS` | `1200` | Reply budget; raise it for reasoning models |
 | `LLM_NUM_RETRIES` | `0` | Provider-level retries |
 | `LLM_MAX_REPAIR_ATTEMPTS` | `1` | Extra calls when JSON is malformed |
 | `MAX_TEXT_CHARS` | `20000` | Truncation limit |

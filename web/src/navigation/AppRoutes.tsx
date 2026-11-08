@@ -12,6 +12,7 @@ import { ScenarioLessonScreen } from '../screens/ScenarioLessonScreen';
 import { LessonSummaryScreen } from '../screens/LessonSummaryScreen';
 import { ScamCheckScreen } from '../screens/ScamCheckScreen';
 import { ScamVerdictScreen } from '../screens/ScamVerdictScreen';
+import { ScamStopScreen } from '../screens/ScamStopScreen';
 import { FamilyCircleScreen } from '../screens/FamilyCircleScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 
@@ -36,6 +37,7 @@ export const AppRoutes: React.FC = () => (
           <Route path={ROUTES.home} element={<HomeScreen />} />
           <Route path={ROUTES.check} element={<ScamCheckScreen />} />
           <Route path={ROUTES.checkResult} element={<ScamVerdictScreen />} />
+          <Route path={ROUTES.checkStop} element={<ScamStopScreen />} />
           <Route path={ROUTES.coach} element={<LessonCatalogScreen />} />
           <Route path="/coach/:lessonId" element={<ScenarioLessonScreen />} />
           <Route path="/coach/:lessonId/complete" element={<LessonSummaryScreen />} />

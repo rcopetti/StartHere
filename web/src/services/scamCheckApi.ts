@@ -9,10 +9,21 @@ import type { ScamCheckResult } from '../types';
 const API_BASE_URL = (import.meta.env?.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
 const REQUEST_TIMEOUT_MS = 30000;
 
+export type ScamCheckChannel =
+  | 'sms'
+  | 'email'
+  | 'link'
+  | 'call'
+  | 'photo'
+  | 'file'
+  | 'unknown';
+
 export interface ScamCheckInput {
   text?: string;
   imageBase64?: string;
   imageMime?: string;
+  file?: File;
+  channel?: ScamCheckChannel;
 }
 
 interface ApiSuccessResponse {
@@ -47,7 +58,9 @@ export function buildScamCheckForm(input: ScamCheckInput): FormData {
     form.append('text', text);
   }
 
-  if (input.imageBase64) {
+  if (input.file) {
+    form.append('file', input.file, input.file.name);
+  } else if (input.imageBase64) {
     const mime = input.imageMime || 'image/jpeg';
     const base64 = input.imageBase64.replace(/^data:[^;]+;base64,/, '');
     form.append(
@@ -57,7 +70,7 @@ export function buildScamCheckForm(input: ScamCheckInput): FormData {
     );
   }
 
-  form.append('channel', input.imageBase64 ? 'photo' : 'unknown');
+  form.append('channel', input.channel ?? resolveChannel(input));
   return form;
 }
 
@@ -94,6 +107,53 @@ export async function checkScamWithApi(
   } finally {
     clearTimeout(timeout);
   }
+}
+
+/**
+ * Turns an API or network failure into calm, plain-language copy. The reader is
+ * never told to ignore the message; she is told not to reply yet.
+ */
+export function scamCheckErrorMessage(error: unknown): string {
+  if (error instanceof ScamCheckApiError) {
+    switch (error.code) {
+      case 'missing_token':
+      case 'invalid_token':
+        return 'Your sign-in has expired. Please sign in again, then check the message.';
+      case 'rate_limited':
+        return 'You have checked a lot of messages in the last hour. Please try again a little later.';
+      case 'file_too_large':
+        return 'That file is too big. Please share a smaller photo or file.';
+      case 'unsupported_file':
+        return 'Please share a photo, a PDF, a Word document, or a text file.';
+      case 'unreadable_file':
+        return "We couldn't read any words from that file. Try a clearer photo or another file.";
+      case 'empty_text':
+      case 'missing_input':
+        return 'Please paste a message or choose a photo or file first.';
+      case 'check_unavailable':
+        return "I can't check right now because the check service is not answering. Don't reply to the message yet. Please try again in a moment.";
+      default:
+        break;
+    }
+  }
+
+  if (error instanceof DOMException && error.name === 'AbortError') {
+    return "The check took too long. Don't reply to the message yet. Please try again in a moment.";
+  }
+
+  if (error instanceof TypeError) {
+    return "I can't check right now because the check service is not answering. Don't reply to the message yet. Please try again in a moment.";
+  }
+
+  return "I can't check this right now. Don't reply to the message yet. Please try again in a moment.";
+}
+
+function resolveChannel(input: ScamCheckInput): ScamCheckChannel {
+  if (input.file) {
+    return input.file.type.startsWith('image/') ? 'photo' : 'file';
+  }
+  if (input.imageBase64) return 'photo';
+  return 'unknown';
 }
 
 function base64ToBlob(base64: string, mime: string): Blob {

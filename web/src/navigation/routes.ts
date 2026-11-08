@@ -6,6 +6,7 @@ export const ROUTES = {
   home: '/home',
   check: '/check',
   checkResult: '/check/result',
+  checkStop: '/check/stop',
   coach: '/coach',
   coachLesson: (lessonId: string) => `/coach/${encodeURIComponent(lessonId)}`,
   coachComplete: (lessonId: string) => `/coach/${encodeURIComponent(lessonId)}/complete`,

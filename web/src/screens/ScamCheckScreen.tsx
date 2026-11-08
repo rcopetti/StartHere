@@ -3,27 +3,38 @@
  * The senior chooses one input method first, then sees only that input.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigate } from 'react-router-dom';
-import { Camera, CircleCheck, MessageSquareText } from 'lucide-react';
+import { Camera, CircleCheck, CircleHelp, FileText, MessageSquareText } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
 import { Heading } from '../components/Heading';
 import { ROUTES } from '../navigation/routes';
 
-type InputMode = 'text' | 'photo';
+type InputMode = 'text' | 'photo' | 'file';
+
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} bytes`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export const ScamCheckScreen: React.FC = () => {
-  const { runScamCheck, fontSize, highContrast } = useApp();
+  const { runScamCheck, scamCheckError, clearScamCheckError, fontSize, highContrast } = useApp();
   const navigate = useNavigate();
   const [inputMode, setInputMode] = useState<InputMode>('text');
   const [inputText, setInputText] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageMime, setImageMime] = useState<string>('image/jpeg');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [showExamples, setShowExamples] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [progressStep, setProgressStep] = useState(0);
 
   const getBodySize = () => {
     switch (fontSize) {
@@ -38,23 +49,51 @@ export const ScamCheckScreen: React.FC = () => {
   };
 
   const canCheck =
-    inputMode === 'text' ? Boolean(inputText.trim()) : Boolean(imagePreview);
+    inputMode === 'text'
+      ? Boolean(inputText.trim())
+      : inputMode === 'photo'
+        ? Boolean(imagePreview)
+        : Boolean(selectedFile);
+
+  useEffect(() => {
+    if (!isAnalyzing) {
+      setProgressStep(0);
+      return;
+    }
+    const timer = setTimeout(() => setProgressStep(1), 1400);
+    return () => clearTimeout(timer);
+  }, [isAnalyzing]);
+
+  const selectMode = (mode: InputMode) => {
+    setInputMode(mode);
+    setFileError(null);
+    clearScamCheckError();
+  };
 
   const handleCheck = async () => {
-    if (!canCheck) return;
+    if (!canCheck || isAnalyzing) return;
     setIsAnalyzing(true);
+    setFileError(null);
+    clearScamCheckError();
+
     try {
-      await runScamCheck({
-        text: inputMode === 'text' ? inputText.trim() : undefined,
-        imageBase64:
-          inputMode === 'photo' && imagePreview
-            ? imagePreview.split(',')[1] || imagePreview
-            : undefined,
-        imageMime,
-      });
-      navigate(ROUTES.checkResult);
-    } catch (err) {
-      console.error('Check failed:', err);
+      const result =
+        inputMode === 'text'
+          ? await runScamCheck({ text: inputText.trim() })
+          : inputMode === 'photo'
+            ? await runScamCheck({
+                imageBase64: imagePreview?.split(',')[1] || imagePreview || undefined,
+                imageMime,
+                channel: 'photo',
+              })
+            : await runScamCheck({
+                file: selectedFile ?? undefined,
+                channel: selectedFile?.type.startsWith('image/') ? 'photo' : 'file',
+              });
+
+      navigate(result.stopScreenRequired ? ROUTES.checkStop : ROUTES.checkResult);
+    } catch {
+      // AppContext already turned the failure into calm copy.
     } finally {
       setIsAnalyzing(false);
     }
@@ -62,13 +101,36 @@ export const ScamCheckScreen: React.FC = () => {
 
   const handleImageUpload = (event: any) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setImageMime(file.type || 'image/jpeg');
+    if (!file) return;
+    setFileError(null);
+    clearScamCheckError();
+    setImageMime(file.type || 'image/jpeg');
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileUpload = (event: any) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      setSelectedFile(null);
+      setImagePreview(null);
+      setFileError('That file is too big. Please share a smaller photo or file.');
+      return;
+    }
+    setFileError(null);
+    clearScamCheckError();
+    setSelectedFile(file);
+    if (file.type.startsWith('image/')) {
+      setImageMime(file.type);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
+      reader.onloadend = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
     }
   };
 
@@ -133,7 +195,7 @@ export const ScamCheckScreen: React.FC = () => {
           style={styles.choiceGrid}
         >
           <Pressable
-            onPress={() => setInputMode('text')}
+            onPress={() => selectMode('text')}
             accessibilityRole="radio"
             aria-checked={inputMode === 'text'}
             accessibilityLabel="Type or paste a message"
@@ -178,7 +240,7 @@ export const ScamCheckScreen: React.FC = () => {
           </Pressable>
 
           <Pressable
-            onPress={() => setInputMode('photo')}
+            onPress={() => selectMode('photo')}
             accessibilityRole="radio"
             aria-checked={inputMode === 'photo'}
             accessibilityLabel="Take a photo of a message"
@@ -221,6 +283,51 @@ export const ScamCheckScreen: React.FC = () => {
               </View>
             )}
           </Pressable>
+          <Pressable
+            onPress={() => selectMode('file')}
+            accessibilityRole="radio"
+            aria-checked={inputMode === 'file'}
+            accessibilityLabel="Send a file to check"
+            style={({ pressed }: { pressed: boolean }) => [
+              styles.choiceCard,
+              styles.choiceCardWide,
+              {
+                backgroundColor:
+                  inputMode === 'file' ? selectedBackground : unselectedBackground,
+                borderColor: inputMode === 'file' ? selectedIcon : unselectedBorder,
+                opacity: pressed ? 0.8 : 1,
+              },
+            ]}
+          >
+            <View style={styles.choiceTitleRow}>
+              <FileText
+                size={26}
+                strokeWidth={2.3}
+                color={inputMode === 'file' ? selectedIcon : unselectedIcon}
+                aria-hidden="true"
+                focusable="false"
+              />
+              <Text
+                style={[
+                  styles.choiceTitle,
+                  { color: inputMode === 'file' ? selectedText : unselectedText },
+                ]}
+              >
+                Send a file
+              </Text>
+            </View>
+            {inputMode === 'file' && (
+              <View style={styles.choiceCheck}>
+                <CircleCheck
+                  size={22}
+                  strokeWidth={2.4}
+                  color={selectedIcon}
+                  aria-hidden="true"
+                  focusable="false"
+                />
+              </View>
+            )}
+          </Pressable>
         </View>
 
         <View
@@ -242,7 +349,10 @@ export const ScamCheckScreen: React.FC = () => {
                 numberOfLines={5}
                 accessibilityLabel="Message to check"
                 value={inputText}
-                onChangeText={setInputText}
+                onChangeText={(value) => {
+                  setInputText(value);
+                  clearScamCheckError();
+                }}
                 placeholder="Paste or type the message…"
                 placeholderTextColor={highContrast ? '#CBD5E1' : '#6B7780'}
                 style={[
@@ -299,7 +409,7 @@ export const ScamCheckScreen: React.FC = () => {
                 </View>
               )}
             </>
-          ) : (
+          ) : inputMode === 'photo' ? (
             <>
               <Text style={[styles.fieldLabel, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
                 Take a photo of the message
@@ -352,14 +462,122 @@ export const ScamCheckScreen: React.FC = () => {
                 </View>
               )}
             </>
+          ) : (
+            <>
+              <Text style={[styles.fieldLabel, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+                Send a file
+              </Text>
+              <View style={styles.fileUploadArea}>
+                <input
+                  type="file"
+                  accept=".pdf,.docx,.txt,.csv,.md,.json,image/png,image/jpeg,image/webp,image/gif"
+                  id="scam-document-upload"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+                <label
+                  htmlFor="scam-document-upload"
+                  style={{
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    minHeight: '140px',
+                    padding: '18px',
+                    textAlign: 'center',
+                    backgroundColor: highContrast ? '#334155' : '#EFF6FF',
+                    borderRadius: '16px',
+                    border: `2px dashed ${highContrast ? '#FFFFFF' : '#3B82F6'}`,
+                    color: highContrast ? '#FFFFFF' : '#1D4ED8',
+                    fontWeight: 700,
+                    fontSize: '18px',
+                  }}
+                >
+                  <FileText size={32} strokeWidth={2.2} color={highContrast ? '#FFFFFF' : '#1D4ED8'} aria-hidden="true" focusable="false" />
+                  {selectedFile ? 'Choose a different file' : 'Choose a file'}
+                </label>
+              </View>
+
+              {selectedFile && (
+                <View style={styles.fileSummary}>
+                  <Text
+                    style={[
+                      styles.fileName,
+                      { fontSize: getBodySize() - 2, color: highContrast ? '#FFFFFF' : '#17212B' },
+                    ]}
+                  >
+                    {selectedFile.name}
+                  </Text>
+                  <Text style={[styles.fileMeta, { color: highContrast ? '#CBD5E1' : '#475569' }]}>
+                    {formatFileSize(selectedFile.size)}
+                  </Text>
+                </View>
+              )}
+
+              {imagePreview && selectedFile?.type.startsWith('image/') && (
+                <View style={styles.imagePreviewContainer}>
+                  <img
+                    src={imagePreview}
+                    alt="Selected picture to check"
+                    style={{
+                      maxHeight: '180px',
+                      borderRadius: '12px',
+                      border: '1px solid #CBD5E1',
+                      objectFit: 'contain',
+                    }}
+                  />
+                </View>
+              )}
+
+              <Text style={[styles.fileHint, { color: highContrast ? '#CBD5E1' : '#475569' }]}>
+                A photo, a PDF, a Word document, or a text file works.
+              </Text>
+            </>
           )}
         </View>
+
+        {(fileError || scamCheckError) && (
+          <View
+            role="alert"
+            style={[
+              styles.errorBox,
+              {
+                backgroundColor: highContrast ? '#78350F' : '#FEF3C7',
+                borderColor: '#F59E0B',
+              },
+            ]}
+          >
+            <CircleHelp
+              size={26}
+              strokeWidth={2.4}
+              color={highContrast ? '#FFFFFF' : '#92400E'}
+              aria-hidden="true"
+              focusable="false"
+            />
+            <Text
+              style={[
+                styles.errorText,
+                {
+                  fontSize: getBodySize() - 2,
+                  lineHeight: (getBodySize() - 2) * 1.4,
+                  color: highContrast ? '#FFFFFF' : '#92400E',
+                },
+              ]}
+            >
+              {fileError || scamCheckError}
+            </Text>
+          </View>
+        )}
 
         <View style={styles.actionContainer}>
           {isAnalyzing ? (
             <View style={styles.loadingBox}>
               <ActivityIndicator size="large" color="#1E5E3A" />
-              <Text style={styles.loadingText}>Looking at it carefully…</Text>
+              <Text style={styles.loadingText}>
+                {progressStep === 0 ? 'Reading the message…' : 'Looking for warning signs…'}
+              </Text>
             </View>
           ) : (
             <BigButton
@@ -423,6 +641,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 2,
     justifyContent: 'center',
+  },
+  choiceCardWide: {
+    flexBasis: '100%',
   },
   choiceCheck: {
     position: 'absolute',
@@ -499,6 +720,38 @@ const styles = StyleSheet.create({
   imagePreviewContainer: {
     alignItems: 'center',
     marginTop: 12,
+  },
+  fileSummary: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  fileName: {
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  fileMeta: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  fileHint: {
+    fontSize: 18,
+    lineHeight: 24,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    borderWidth: 2,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+  },
+  errorText: {
+    flex: 1,
+    fontWeight: '700',
   },
   actionContainer: {
     marginTop: 0,

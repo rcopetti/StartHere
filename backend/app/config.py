@@ -42,7 +42,9 @@ class Settings(BaseSettings):
     llm_api_base: str | None = None
     llm_timeout_seconds: float = 20.0
     llm_temperature: float = 0.1
-    llm_max_tokens: int = 700
+    # Reasoning-capable local models spend tokens before the JSON reply; 1200
+    # leaves room for both. Raise it further for verbose models.
+    llm_max_tokens: int = 1200
     llm_num_retries: int = 0
     # Extra calls allowed when the model replies with unparseable JSON.
     llm_max_repair_attempts: int = 1

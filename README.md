@@ -53,7 +53,11 @@ The production build includes the PWA manifest, icons, and service worker. The s
 
 ### AI configuration
 
-Scam Check and Coach still run without an AI key and use their local fallback behavior. For production, route AI calls through the Cloud Functions described in [the specification](./docs/SPECIFICATION.md); do not embed Gemini or Vertex AI keys in the web client or commit them to the repository.
+Scam Check calls the FastAPI service in `backend/` whenever `VITE_API_BASE_URL`
+is set. If no API URL is configured, the client uses a deterministic offline
+check that never reports "looks safe" and never holds a provider key. Do not
+embed Gemini or Vertex AI keys in the web client or commit them to the
+repository; provider credentials belong to the backend.
 
 ### Sign-in setup (Firebase Authentication)
 
@@ -76,7 +80,7 @@ The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-b
 
 ```bash
 npm run lint
-node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts web/src/services/scamCheckApi.test.ts
+node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/scamCheckFallback.test.ts web/src/services/scamCheckApi.test.ts
 ```
 
 ### Scam Check API (FastAPI backend)
@@ -150,8 +154,9 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 | `/sign-in` | Google sign-in |
 | `/onboarding` | First-run text-size setup |
 | `/home` | Guided Home |
-| `/check` | Scam Check input |
+| `/check` | Scam Check input (text, photo, or file) |
 | `/check/result` | Latest Scam Check result |
+| `/check/stop` | Stop Screen for money or code scams |
 | `/coach` | Coach session list |
 | `/coach/:lessonId` | Session quiz |
 | `/family` | Family Circle |
@@ -172,10 +177,10 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 1. **Patient Tech Coach**
    - A session list with short, scenario-based quizzes covering phone basics, everyday tasks, and scam safety.
    - One question at a time with plain-language explanations and calm feedback.
-   - Pre-Gemini sensitive number guard for SSNs, card numbers, and passwords.
+   - Pre-AI sensitive number guard for SSNs, card numbers, and passwords.
 
 2. **Instant Scam Check (`scamCheck`)**
-   - Text message and screenshot scam analyzer powered by Gemini Flash (temp 0.1).
+   - Text, photo, and PDF/DOCX/TXT checks powered by the FastAPI service and LiteLLM.
    - Plain-language verdict: `likely_scam`, `caution`, or `looks_safe`.
    - Clear recommended action steps and danger signals.
    - Automated family alerting option on high-risk scams.
@@ -214,7 +219,7 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 │       ├── components/                   # AppShell, BottomTabs, AppHeader, BigButton
 │       ├── screens/                      # Home, Check, Coach, Family, Settings
 │       ├── context/                      # App state and Firebase sync
-│       └── services/                     # Gemini and Firebase services
+│       └── services/                     # Scam Check API, offline fallback, Firebase
 ├── vite.config.ts                        # Vite, React Native Web aliasing, public assets
 ├── package.json                          # Dependencies and scripts
 └── README.md                             # Project overview and run guide

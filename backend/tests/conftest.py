@@ -11,6 +11,41 @@ from app.main import create_app
 from app.services.auth import AuthenticatedUser
 from app.services.llm import JsonCompletion
 
+# LiteLLM calls load_dotenv() on import, so backend/.env leaks into os.environ.
+# Clear these before each test so settings assertions are deterministic.
+_SETTINGS_ENV_VARS = (
+    "APP_NAME",
+    "APP_VERSION",
+    "API_PREFIX",
+    "ENVIRONMENT",
+    "LOG_LEVEL",
+    "CORS_ALLOW_ORIGINS",
+    "LLM_MODEL",
+    "LLM_PROVIDER",
+    "LLM_FALLBACK_MODELS",
+    "LLM_API_KEY",
+    "LLM_API_BASE",
+    "LLM_TIMEOUT_SECONDS",
+    "LLM_TEMPERATURE",
+    "LLM_MAX_TOKENS",
+    "LLM_NUM_RETRIES",
+    "LLM_MAX_REPAIR_ATTEMPTS",
+    "FIREBASE_PROJECT_ID",
+    "FIREBASE_CREDENTIALS_JSON",
+    "FIREBASE_CREDENTIALS_PATH",
+    "FIREBASE_AUTH_EMULATOR_HOST",
+    "MAX_TEXT_CHARS",
+    "MAX_FILE_BYTES",
+    "MAX_PDF_PAGES",
+    "RATE_LIMIT_PER_HOUR",
+)
+
+
+@pytest.fixture(autouse=True)
+def clean_settings_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in _SETTINGS_ENV_VARS:
+        monkeypatch.delenv(name, raising=False)
+
 
 class FakeVerifier:
     def __init__(self, user: AuthenticatedUser | None = None, error: Exception | None = None):
