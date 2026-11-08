@@ -33,6 +33,20 @@ def test_fallbacks_receive_the_provider_prefix() -> None:
     assert settings.resolved_fallback_models == ["ollama/llama3.1", "ollama/qwen2.5"]
 
 
+def test_cloudflare_models_receive_the_provider_prefix() -> None:
+    settings = Settings(
+        _env_file=None,
+        llm_provider="cloudflare",
+        llm_model="@cf/meta/llama-3.1-8b-instruct",
+        llm_fallback_models="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    )
+
+    assert settings.resolved_model == "cloudflare/@cf/meta/llama-3.1-8b-instruct"
+    assert settings.resolved_fallback_models == [
+        "cloudflare/@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+    ]
+
+
 def test_blank_environment_values_are_treated_as_unset(monkeypatch) -> None:
     monkeypatch.setenv("LLM_API_KEY", "")
     monkeypatch.setenv("LLM_API_BASE", "")

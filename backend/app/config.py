@@ -113,7 +113,9 @@ class Settings(BaseSettings):
         return [self._with_provider(model) for model in self.fallback_models]
 
     def _with_provider(self, model: str) -> str:
-        if self.llm_provider and "/" not in model:
+        # Cloudflare model ids ("@cf/meta/...") contain a slash but still need
+        # the provider prefix, so treat a leading "@" as unprefixed.
+        if self.llm_provider and ("/" not in model or model.startswith("@")):
             return f"{self.llm_provider}/{model}"
         return model
 
