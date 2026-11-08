@@ -5,13 +5,33 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { BigButton } from '../components/BigButton';
 import { Heading } from '../components/Heading';
 import { ROUTES } from '../navigation/routes';
+
+const GoogleMark: React.FC = () => (
+  <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path
+      fill="#4285F4"
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+    />
+    <path
+      fill="#EA4335"
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+    />
+  </svg>
+);
 
 export const SignInScreen: React.FC = () => {
   const { authStage, authError, signInWithGoogle, fontSize, highContrast } = useApp();
@@ -44,6 +64,13 @@ export const SignInScreen: React.FC = () => {
   const muted = highContrast ? '#E2E8F0' : '#435159';
   const cardBackground = highContrast ? '#111111' : '#FFFFFF';
   const cardBorder = highContrast ? '#FFFFFF' : '#D9DFDA';
+  const signInDisabled = pending || authStage === 'loading';
+
+  const handleSignIn = () => {
+    if (signInDisabled) return;
+    setPending(true);
+    void signInWithGoogle().finally(() => setPending(false));
+  };
 
   return (
     <View style={[styles.page, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
@@ -69,17 +96,29 @@ export const SignInScreen: React.FC = () => {
           </View>
         )}
 
-        <BigButton
-          label={pending ? 'Opening Google…' : 'Sign in with Google'}
-          sublabel="Uses your Google account"
-          variant="navy"
-          onPress={() => {
-            setPending(true);
-            void signInWithGoogle().finally(() => setPending(false));
-          }}
-          disabled={pending || authStage === 'loading'}
-          minHeight={68}
-        />
+        <Pressable
+          onPress={handleSignIn}
+          disabled={signInDisabled}
+          accessibilityRole="button"
+          accessibilityLabel="Sign in with Google"
+          accessibilityState={{ disabled: signInDisabled }}
+          style={({ pressed }: { pressed: boolean }) => [
+            styles.googleButton,
+            {
+              backgroundColor: '#FFFFFF',
+              borderColor: highContrast ? '#000000' : '#DADCE0',
+              borderWidth: highContrast ? 3 : 1,
+              opacity: signInDisabled ? 0.6 : pressed ? 0.85 : 1,
+            },
+          ]}
+        >
+          <View style={styles.googleMarkWrap}>
+            <GoogleMark />
+          </View>
+          <Text style={[styles.googleButtonText, { fontSize: bodySize }]}>
+            {pending ? 'Opening Google…' : 'Sign in with Google'}
+          </Text>
+        </Pressable>
 
         <View style={[styles.reassureCard, { backgroundColor: cardBackground, borderColor: cardBorder }]}>
           <Lock size={24} strokeWidth={2.2} color="#1E5E3A" aria-hidden="true" focusable="false" />
@@ -157,6 +196,33 @@ const styles = StyleSheet.create({
     fontSize: 19,
     lineHeight: 26,
     fontWeight: '600',
+  },
+  googleButton: {
+    width: '100%',
+    minHeight: 64,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 14,
+    borderRadius: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  googleMarkWrap: {
+    width: 26,
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleButtonText: {
+    color: '#1F1F1F',
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   reassureCard: {
     flexDirection: 'row',
