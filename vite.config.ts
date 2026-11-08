@@ -26,6 +26,14 @@ export default defineConfig(() => {
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
       allowedHosts: ['localhost', '127.0.0.1', 'carless-almost-brought.ngrok-free.dev'],
+      // Same-origin API calls in development: the client requests /api/... on
+      // the Vite host and Vite forwards them to the FastAPI service.
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:8080',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });

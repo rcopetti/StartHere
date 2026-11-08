@@ -25,6 +25,7 @@ test('shows tabs only on top-level destinations', () => {
   assert.equal(shouldShowTabs('/check'), true);
   assert.equal(shouldShowTabs('/coach'), true);
   assert.equal(shouldShowTabs('/check/result'), false);
+  assert.equal(shouldShowTabs('/check/stop'), false);
   assert.equal(shouldShowTabs('/coach/fake-bank-text'), false);
   assert.equal(shouldShowTabs('/settings'), false);
   assert.equal(shouldShowTabs('/sign-in'), false);
@@ -39,6 +40,7 @@ test('reads a lesson id from the quiz route', () => {
 
 test('finds a calm parent route', () => {
   assert.equal(parentRouteForPath('/check/result'), '/check');
+  assert.equal(parentRouteForPath('/check/stop'), '/check');
   assert.equal(parentRouteForPath('/coach/fake-bank-text'), '/coach');
   assert.equal(parentRouteForPath('/settings'), '/home');
   assert.equal(parentRouteForPath('/sign-in'), '/sign-in');

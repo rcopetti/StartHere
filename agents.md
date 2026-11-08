@@ -392,7 +392,7 @@ functions/                        # Backend Cloud Functions (Node.js/TypeScript)
 
 ## 7. Rules for Autonomous Agents Modifying Code
 
-1. **Zero Client AI Keys**: Never store Gemini or Vertex AI API keys in the Flutter or React clients. All AI calls must route through callable Cloud Functions (`coachTurn`, `scamCheck`).
+1. **Zero Client AI Keys**: Never store Gemini or Vertex AI API keys in the Flutter or React clients. All AI calls must route through the FastAPI service in `backend/` or the callable Cloud Functions (`coachTurn`, `scamCheck`).
 2. **Never Inject Technical Jargon**: System prompts, UI text, and error states must always adhere to 6th-grade reading level.
 3. **Preserve Minimum Button and Font Dimensions**: Primary buttons $\ge 64\text{pt}$ tall, full width; body text $\ge 20\text{pt}$. Do not use small pill badges or micro floating action buttons.
 4. **Respect MVP Directives**:
@@ -413,4 +413,45 @@ functions/                        # Backend Cloud Functions (Node.js/TypeScript)
 - **Route tests**: `node --import tsx --test web/src/navigation/routes.test.ts`.
 - **PWA tests**: `node --import tsx --test web/src/pwa.test.ts`.
 - **Gemini fallback test**: `node --import tsx --test web/src/services/gemini.test.ts`.
+
+---
+
+## 9. Scam Check API (FastAPI, `backend/`)
+
+The `check a suspicious message` API is a stateless Python service. The web
+client calls it with the user's Firebase ID token when `VITE_API_BASE_URL` is set.
+
+```
+backend/
+  pyproject.toml              # FastAPI, LiteLLM, PyJWT, pypdf
+  .env.example                # every supported knob
+  app/
+    main.py                   # app factory, CORS, error envelope, request ids
+    config.py                 # pydantic-settings, LLM_* and FIREBASE_* env vars
+    api/deps.py               # require_user (Firebase) + rate limit
+    api/routes/               # health.py, scam_check.py
+    models/scam_check.py      # camelCase request/response contract
+    prompts/scam_check.py     # senior tone charter, untrusted envelope
+    services/llm.py           # LiteLLM adapter + JSON repair + fallbacks
+    services/scam_check.py    # normalization, fail-closed behavior
+    services/inputs.py        # image, PDF, DOCX, TXT handling
+    services/guards.py        # sensitive-data guard, redaction, stop-screen rules
+  tests/                      # 44 tests, no network calls
+```
+
+- **Run**: `cd backend && .venv/bin/uvicorn app.main:app --reload --port 8080`.
+- **Install**: `cd backend && python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"`.
+- **Tests**: `cd backend && .venv/bin/pytest`.
+- **Lint**: `cd backend && .venv/bin/ruff check .`.
+- **Provider switch**: set `LLM_MODEL` (e.g. `gemini/gemini-2.5-flash`,
+  `bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0`, `ollama/llama3.2`).
+  `LLM_FALLBACK_MODELS` is a comma-separated fallback chain.
+- **Auth**: every `/api/v1/scam-check*` request needs a Firebase ID token.
+  Set `FIREBASE_PROJECT_ID` to the web client's project; verification uses
+  Google's Firebase JWKS and needs no service account.
+  `FIREBASE_AUTH_EMULATOR_HOST` is optional for the local emulator.
+- **Fail closed**: provider errors and unusable JSON return `503 check_unavailable`;
+  never emit an unverified verdict.
+- **Privacy**: never log message text, file text, or screenshots. The service
+  logs only ids, verdicts, timings, and model names.
 

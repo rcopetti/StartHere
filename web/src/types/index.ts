@@ -120,9 +120,12 @@ export interface ScamCheckResult {
   signals: string[];
   riskScore: number;
   previewText: string;
-  inputType: 'text' | 'image';
+  inputType: 'text' | 'image' | 'file' | 'mixed';
   createdAt: number;
   alertSent?: boolean;
+  /** Set by the API when the full-screen Stop Screen should be shown. */
+  stopScreenRequired?: boolean;
+  riskCategories?: string[];
 }
 
 export type ScreenId =

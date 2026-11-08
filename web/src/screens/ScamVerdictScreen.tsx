@@ -153,12 +153,21 @@ export const ScamVerdictScreen: React.FC = () => {
         <View style={styles.buttonStack}>
           {activeScamResult.verdict === 'likely_scam' && (
             <>
-              <BigButton
-                label="Notify family about this scam"
-                variant="danger"
-                onPress={handleNotifyFamily}
-                minHeight={64}
-              />
+              {activeScamResult.stopScreenRequired ? (
+                <BigButton
+                  label="What do I do now?"
+                  variant="danger"
+                  onPress={() => navigate(ROUTES.checkStop)}
+                  minHeight={64}
+                />
+              ) : (
+                <BigButton
+                  label="Notify family about this scam"
+                  variant="danger"
+                  onPress={handleNotifyFamily}
+                  minHeight={64}
+                />
+              )}
               <View style={{ marginTop: 8 }}>
                 <BigButton
                   label="I deleted the message — all set"

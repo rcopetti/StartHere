@@ -32,9 +32,33 @@ import {
   seedLessonsIfEmpty,
   saveCoachSession,
   saveScamCheckRecord,
+  auth,
 } from '../services/firebase';
-import { analyzeScamCheck } from '../services/gemini';
+import { analyzeScamCheck } from '../services/scamCheckFallback';
+import {
+  ScamCheckApiError,
+  checkScamWithApi,
+  isScamCheckApiConfigured,
+  scamCheckErrorMessage,
+  type ScamCheckInput,
+} from '../services/scamCheckApi';
 import { resolveAuthStage, type AuthStage } from '../auth/authState';
+
+/**
+ * The FastAPI service is the primary check path so model choice and provider
+ * keys stay on the server. The on-device check is used only when no API URL is
+ * configured. API failures surface to the reader instead of guessing.
+ */
+async function requestScamCheck(input: ScamCheckInput): Promise<ScamCheckResult> {
+  if (!isScamCheckApiConfigured()) {
+    return analyzeScamCheck(input);
+  }
+  if (!auth.currentUser) {
+    throw new ScamCheckApiError('missing_token', 'Sign in again to check a message.');
+  }
+  const idToken = await auth.currentUser.getIdToken();
+  return checkScamWithApi(input, idToken);
+}
 
 interface AppContextType {
   user: UserProfile | null;
@@ -73,7 +97,9 @@ interface AppContextType {
   answerScenario: (selectedAnswer: 'legit' | 'scam') => void;
   nextScenario: () => boolean;
   exitLesson: () => void;
-  runScamCheck: (input: { text?: string; imageBase64?: string; imageMime?: string }) => Promise<ScamCheckResult>;
+  runScamCheck: (input: ScamCheckInput) => Promise<ScamCheckResult>;
+  scamCheckError: string | null;
+  clearScamCheckError: () => void;
   triggerEmergencyHelp: () => Promise<void>;
   acknowledgeFamilyAlert: (alertId: string) => Promise<void>;
   inviteFamilyMember: (name: string, relationship: string, phone: string) => Promise<TrustedContact>;
@@ -106,6 +132,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [latestAnswer, setLatestAnswer] = useState<ScenarioAnswer | null>(null);
   const [isScenarioAnswered, setIsScenarioAnswered] = useState<boolean>(false);
   const [activeScamResult, setActiveScamResult] = useState<ScamCheckResult | null>(null);
+  const [scamCheckError, setScamCheckError] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [trustedContacts, setTrustedContacts] = useState<TrustedContact[]>([]);
 
@@ -334,8 +361,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLatestAnswer(null);
   };
 
-  const runScamCheck = async (input: { text?: string; imageBase64?: string; imageMime?: string }) => {
-    const result = await analyzeScamCheck(input);
+  const runScamCheck = async (input: ScamCheckInput) => {
+    setScamCheckError(null);
+
+    let result: ScamCheckResult;
+    try {
+      result = await requestScamCheck(input);
+    } catch (error) {
+      setScamCheckError(scamCheckErrorMessage(error));
+      throw error;
+    }
+
     setActiveScamResult(result);
 
     if (user) {
@@ -357,6 +393,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     return result;
   };
+
+  const clearScamCheckError = () => setScamCheckError(null);
 
   const triggerEmergencyHelp = async () => {
     if (!user) return;
@@ -411,6 +449,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         nextScenario,
         exitLesson,
         runScamCheck,
+        scamCheckError,
+        clearScamCheckError,
         triggerEmergencyHelp,
         acknowledgeFamilyAlert,
         inviteFamilyMember,

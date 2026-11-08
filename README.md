@@ -53,7 +53,13 @@ The production build includes the PWA manifest, icons, and service worker. The s
 
 ### AI configuration
 
-Scam Check and Coach still run without an AI key and use their local fallback behavior. For production, route AI calls through the Cloud Functions described in [the specification](./docs/SPECIFICATION.md); do not embed Gemini or Vertex AI keys in the web client or commit them to the repository.
+Scam Check calls the FastAPI service in `backend/` whenever `VITE_API_BASE_URL`
+is set. `"/"` (the default) keeps requests on the current host; the Vite dev
+server proxies `/api` to `http://localhost:8080`. Use an absolute URL to call the
+API directly. If no API URL is configured, the client uses a deterministic
+offline check that never reports "looks safe" and never holds a provider key. Do
+not embed Gemini or Vertex AI keys in the web client or commit them to the
+repository; provider credentials belong to the backend.
 
 ### Sign-in setup (Firebase Authentication)
 
@@ -76,7 +82,41 @@ The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-b
 
 ```bash
 npm run lint
-node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
+node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/scamCheckFallback.test.ts web/src/services/scamCheckApi.test.ts
+```
+
+### Scam Check API (FastAPI backend)
+
+`backend/` is a stateless FastAPI service that performs the scam check
+server-side, so the model choice and provider keys never reach the browser. It
+accepts typed text, a photo, or a PDF/DOCX/TXT file.
+
+```bash
+cd backend
+python3 -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+cp .env.example .env
+.venv/bin/uvicorn app.main:app --reload --port 8080
+```
+
+- `LLM_MODEL` selects the backend through LiteLLM: `gemini/gemini-2.5-flash`,
+  `bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0`, `ollama/llama3.2`, and so on.
+  `LLM_FALLBACK_MODELS` adds a fallback chain.
+- Every check requires a Firebase ID token. Set `FIREBASE_PROJECT_ID` in
+  `backend/.env` to the same value as `VITE_FIREBASE_PROJECT_ID`; verification
+  uses Google's public signing keys and needs no service account.
+  `FIREBASE_AUTH_EMULATOR_HOST` is optional for local emulator testing.
+- `VITE_API_BASE_URL="/"` in the root `.env` routes the web client through the
+  API on the same origin; Vite proxies `/api` to `http://localhost:8080`
+  (override the target with `VITE_API_PROXY_TARGET`). Use an absolute URL to
+  call the API directly, or leave it blank to keep the on-device fallback.
+- Endpoints, response schema, and the full variable list:
+  [backend/README.md](./backend/README.md).
+
+```bash
+cd backend
+.venv/bin/pytest
+.venv/bin/ruff check .
 ```
 
 ### Scam Check benchmark
@@ -119,8 +159,9 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 | `/sign-in` | Google sign-in |
 | `/onboarding` | First-run text-size setup |
 | `/home` | Guided Home |
-| `/check` | Scam Check input |
+| `/check` | Scam Check input (text, photo, or file) |
 | `/check/result` | Latest Scam Check result |
+| `/check/stop` | Stop Screen for money or code scams |
 | `/coach` | Coach session list |
 | `/coach/:lessonId` | Session quiz |
 | `/family` | Family Circle |
@@ -141,10 +182,10 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 1. **Patient Tech Coach**
    - A session list with short, scenario-based quizzes covering phone basics, everyday tasks, and scam safety.
    - One question at a time with plain-language explanations and calm feedback.
-   - Pre-Gemini sensitive number guard for SSNs, card numbers, and passwords.
+   - Pre-AI sensitive number guard for SSNs, card numbers, and passwords.
 
 2. **Instant Scam Check (`scamCheck`)**
-   - Text message and screenshot scam analyzer powered by Gemini Flash (temp 0.1).
+   - Text, photo, and PDF/DOCX/TXT checks powered by the FastAPI service and LiteLLM.
    - Plain-language verdict: `likely_scam`, `caution`, or `looks_safe`.
    - Clear recommended action steps and danger signals.
    - Automated family alerting option on high-risk scams.
@@ -164,6 +205,10 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 ## Project Structure
 
 ```
+├── backend/                              # FastAPI Scam Check service (Python, LiteLLM)
+│   ├── app/                              # routes, services, prompts, models
+│   ├── tests/                            # pytest suite
+│   └── README.md                         # provider, auth, and endpoint reference
 ├── docs/
 │   ├── SPECIFICATION.md                  # Full technical spec & architecture
 │   ├── MOBILE_CALLER_ID_APPROACH.md      # Mobile caller ID & screening architecture
@@ -179,7 +224,7 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 │       ├── components/                   # AppShell, BottomTabs, AppHeader, BigButton
 │       ├── screens/                      # Home, Check, Coach, Family, Settings
 │       ├── context/                      # App state and Firebase sync
-│       └── services/                     # Gemini and Firebase services
+│       └── services/                     # Scam Check API, offline fallback, Firebase
 ├── vite.config.ts                        # Vite, React Native Web aliasing, public assets
 ├── package.json                          # Dependencies and scripts
 └── README.md                             # Project overview and run guide
