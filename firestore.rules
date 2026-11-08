@@ -2,6 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Default deny all documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     function isSignedIn() {
       return request.auth != null;
     }
@@ -14,64 +19,155 @@ service cloud.firestore {
       return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    function incoming() {
-      return request.resource.data;
+    function isValidUser(data) {
+      return data.keys().hasAll([
+               'uid', 'role', 'displayName', 'onboarded',
+               'fontSizePreference', 'highContrast', 'autoAlertOnScam', 'createdAt'
+             ]) &&
+             data.uid == request.auth.uid &&
+             data.role in ['senior', 'family'] &&
+             data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 100 &&
+             data.onboarded is bool &&
+             data.fontSizePreference in ['standard', 'large', 'extra_large'] &&
+             data.highContrast is bool &&
+             data.autoAlertOnScam is bool &&
+             data.createdAt is number &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 254)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 30)) &&
+             (!('updatedAt' in data) || data.updatedAt is number);
     }
 
-    function existing() {
-      return resource.data;
+    function isValidContact(data, seniorUid) {
+      return data.keys().hasAll(['id', 'seniorUid', 'name', 'relationship', 'phone', 'status']) &&
+             data.seniorUid == seniorUid &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.relationship is string && data.relationship.size() <= 50 &&
+             data.phone is string && data.phone.size() <= 30 &&
+             data.status in ['invited', 'active'] &&
+             (!('inviteToken' in data) || (data.inviteToken is string && data.inviteToken.size() <= 64)) &&
+             (!('linkedUid' in data) || (data.linkedUid is string && data.linkedUid.size() <= 128)) &&
+             (!('linkedAt' in data) || data.linkedAt is number);
     }
 
-    // Default deny all documents
-    match /{document=**} {
-      allow read, write: if false;
+    function isValidSession(data, seniorUid) {
+      return data.keys().hasAll([
+               'id', 'seniorUid', 'lessonId', 'lessonTitle',
+               'currentStep', 'totalSteps', 'status',
+               'scenarioAnswers', 'score', 'startedAt'
+             ]) &&
+             data.seniorUid == seniorUid &&
+             data.id is string && data.id.size() <= 128 &&
+             data.lessonId is string && data.lessonId.size() <= 100 &&
+             data.lessonTitle is string && data.lessonTitle.size() <= 200 &&
+             data.currentStep is number &&
+             data.totalSteps is number &&
+             data.status in ['active', 'completed', 'abandoned'] &&
+             data.scenarioAnswers is list &&
+             data.score is number &&
+             data.startedAt is number &&
+             (!('completedAt' in data) || data.completedAt is number);
+    }
+
+    function isValidAlert(data) {
+      return data.keys().hasAll([
+               'id', 'seniorUid', 'seniorName', 'type',
+               'headline', 'summary', 'actionTaken', 'sentAt'
+             ]) &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+             data.seniorUid is string && data.seniorUid.size() <= 128 &&
+             data.seniorName is string && data.seniorName.size() <= 100 &&
+             data.type in ['scam_detected', 'manual_help_request'] &&
+             data.headline is string && data.headline.size() <= 200 &&
+             data.summary is string && data.summary.size() <= 1000 &&
+             data.actionTaken is string && data.actionTaken.size() <= 500 &&
+             data.sentAt is number &&
+             (!('verdict' in data) || data.verdict in ['likely_scam', 'caution', 'looks_safe']) &&
+             (!('seniorPhone' in data) || (data.seniorPhone is string && data.seniorPhone.size() <= 30)) &&
+             (!('ackAt' in data) || data.ackAt is number) &&
+             (!('acknowledgedBy' in data) || (data.acknowledgedBy is string && data.acknowledgedBy.size() <= 100));
+    }
+
+    function isValidScamCheck(data, seniorUid) {
+      return data.keys().hasAll([
+               'id', 'seniorUid', 'verdict', 'headline', 'explanation',
+               'action', 'signals', 'riskScore', 'previewText',
+               'inputType', 'createdAt'
+             ]) &&
+             data.seniorUid == seniorUid &&
+             data.id is string && data.id.size() > 0 && data.id.size() <= 128 &&
+             data.verdict in ['likely_scam', 'caution', 'looks_safe'] &&
+             data.headline is string && data.headline.size() <= 200 &&
+             data.explanation is string && data.explanation.size() <= 1000 &&
+             data.action is string && data.action.size() <= 500 &&
+             data.signals is list &&
+             data.riskScore is number &&
+             data.previewText is string && data.previewText.size() <= 500 &&
+             data.inputType in ['text', 'image'] &&
+             data.createdAt is number &&
+             (!('alertSent' in data) || data.alertSent is bool);
+    }
+
+    // Health check ping for app boot validation
+    match /test/connection {
+      allow read: if true;
     }
 
     // User profiles: users/{userId}
     match /users/{userId} {
-      allow get: if isSignedIn() && (isOwner(userId) || true);
-      allow list: if isSignedIn();
-      allow create: if isOwner(userId) && isValidId(userId);
-      allow update: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
       allow delete: if isOwner(userId);
 
       // Subcollection: trustedContacts
       match /trustedContacts/{contactId} {
-        allow read: if isSignedIn();
-        allow create: if isOwner(userId) && isValidId(contactId);
-        allow update: if isSignedIn();
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(contactId) && isValidContact(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidContact(request.resource.data, userId);
         allow delete: if isOwner(userId);
       }
 
       // Subcollection: sessions
       match /sessions/{sessionId} {
         allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidId(sessionId);
-        allow update: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(sessionId) && isValidSession(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidSession(request.resource.data, userId);
         allow delete: if isOwner(userId);
       }
     }
 
     // High-priority alerts: alerts/{alertId}
     match /alerts/{alertId} {
-      allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(alertId);
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn() && existing().seniorUid == request.auth.uid;
+      allow get, list: if isSignedIn() && resource.data.seniorUid == request.auth.uid;
+      allow create: if isSignedIn()
+                    && isValidId(alertId)
+                    && request.resource.data.seniorUid == request.auth.uid
+                    && isValidAlert(request.resource.data);
+      allow update: if isSignedIn()
+                    && resource.data.seniorUid == request.auth.uid
+                    && isValidAlert(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.seniorUid == request.auth.uid;
+    }
+
+    // Scam checks history: scamChecks/{checkId}
+    match /scamChecks/{checkId} {
+      allow get, list: if isSignedIn() && resource.data.seniorUid == request.auth.uid;
+      allow create: if isSignedIn()
+                    && isValidId(checkId)
+                    && request.resource.data.seniorUid == request.auth.uid
+                    && isValidScamCheck(request.resource.data, request.auth.uid);
+      allow update: if isSignedIn()
+                    && resource.data.seniorUid == request.auth.uid
+                    && isValidScamCheck(request.resource.data, request.auth.uid);
+      allow delete: if isSignedIn() && resource.data.seniorUid == request.auth.uid;
     }
 
     // Public curated lessons library: lessons/{lessonId}
     match /lessons/{lessonId} {
       allow read: if true;
       allow write: if isSignedIn();
-    }
-
-    // Scam checks history: scamChecks/{checkId}
-    match /scamChecks/{checkId} {
-      allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && isValidId(checkId);
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn() && existing().seniorUid == request.auth.uid;
     }
   }
 }

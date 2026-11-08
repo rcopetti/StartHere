@@ -55,6 +55,20 @@ The production build includes the PWA manifest, icons, and service worker. The s
 
 Scam Check and Coach still run without an AI key and use their local fallback behavior. For production, route AI calls through the Cloud Functions described in [the specification](./docs/SPECIFICATION.md); do not embed Gemini or Vertex AI keys in the web client or commit them to the repository.
 
+### Sign-in setup (Firebase Authentication)
+
+StartHere signs people in with Google. Anonymous sessions and demo accounts are not used; every visitor must sign in before the app opens.
+
+1. Firebase Console → **Authentication** → **Sign-in method** → enable **Google**.
+2. Firebase Console → **Authentication** → **Settings** → **Authorized domains**: add `localhost`, the production host, and any tunnel host used for device testing.
+3. Deploy the hardened Firestore rules once the client is updated:
+
+```bash
+firebase deploy --only firestore:rules --project starthere-3e5dc
+```
+
+The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-bde7-6558da3396b5`, so a `firebase.json` Firestore target that names the database is required for CLI deploys.
+
 ### Verify the app
 
 ```bash
@@ -75,6 +89,8 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 
 | Route | Screen |
 |---|---|
+| `/sign-in` | Google sign-in |
+| `/onboarding` | First-run text-size setup |
 | `/home` | Guided Home |
 | `/check` | Scam Check input |
 | `/check/result` | Latest Scam Check result |
