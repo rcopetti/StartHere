@@ -97,6 +97,7 @@ export const BigButton: React.FC<BigButtonProps> = ({
               styles.label,
               {
                 fontSize: getFontSize(),
+                lineHeight: getFontSize() * 1.2,
                 color: getTextColor(),
                 fontWeight: highContrast ? '800' : '700',
               },
@@ -110,8 +111,8 @@ export const BigButton: React.FC<BigButtonProps> = ({
                 styles.sublabel,
                 {
                   fontSize: getFontSize() - 4,
+                  lineHeight: (getFontSize() - 4) * 1.35,
                   color: getTextColor(),
-                  opacity: 0.9,
                 },
               ]}
             >
@@ -151,6 +152,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textContainer: {
+    flex: 1,
+    minWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -64,7 +64,7 @@ export const FamilyCircleScreen: React.FC = () => {
         {/* Panic / Emergency Button Hero */}
         <View style={styles.emergencyCard}>
           <BigButton
-            label="🚨 ASK FAMILY FOR HELP NOW"
+            label="ASK FAMILY FOR HELP NOW"
             sublabel="Tap here to send an urgent help alert to your circle immediately"
             variant="danger"
             onPress={handlePanicAlert}
