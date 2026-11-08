@@ -20,7 +20,7 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 
 **Hierarchy:** Greeting and reassurance → primary check action → next session preview → trusted contact status → daily tip.
 
-**Interaction model:** A guided home hub, a filterable vertical session list, and one quiz question at a time.
+**Interaction model:** A guided home hub, a filterable vertical session list, and one quiz question at a time, with URL routes as the source of page navigation.
 
 **Responsive priority:** Design first for a narrow phone viewport, but render the app directly in the page at every size. Do not wrap the interface in a simulated phone frame, bezel, notch, status bar, or home indicator. Let content adapt naturally to wider desktop viewports.
 
@@ -56,6 +56,23 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 - Keep the tab bar on the three top-level destinations. Hide it during a focused quiz or other deep task, where a visible Back or Close control is used instead.
 - Do not use swipe navigation or a hamburger menu.
 
+### Route Contract
+
+- Use explicit browser URL routes for page navigation in this React Native Web/Vite app. Use React Router rather than keeping `currentScreen` as the navigation source of truth.
+- Route map:
+  - `/` redirects to `/onboarding` for a new user or `/home` for an onboarded user.
+  - `/onboarding` shows welcome/setup.
+  - `/home` shows the guided home hub.
+  - `/check` shows Scam Check; `/check/result` shows the current verdict.
+  - `/coach` shows the session list.
+  - `/coach/:lessonId` shows that session's quiz.
+  - `/coach/:lessonId/complete` shows the session result.
+  - `/family`, `/family-portal`, and `/settings` keep the existing destinations addressable.
+- The three tabs link to `/home`, `/check`, and `/coach`; session cards link to their `/coach/:lessonId` route.
+- Browser Back and Forward must follow route history. In-app Back/Close controls navigate to a sensible parent route and remain visible on focused quiz/result screens.
+- Keep quiz answer and question progress in the existing lesson/session state; route changes identify the page, not each answer selection.
+- Unknown or incomplete routes show a calm recovery path to the relevant parent page. Refreshing a supported route must render the application rather than a server 404.
+
 ### Coach Session List
 
 - Treat Coach as the existing patient tech-coach lesson catalog.
@@ -74,8 +91,9 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 ## Interaction and Data Flow
 
 - Home reads the existing user, trusted contacts, and lesson list from `AppContext`.
-- `Check something` calls the existing `setScreen('scam-check')` navigation.
-- The Home session preview's `See all sessions` action and Coach tab open the catalog route. Starting or continuing a session calls the existing `startLesson(lesson)` action, which opens the current quiz flow.
+- `Check something` navigates to `/check`.
+- The Home session preview's `See all sessions` action and Coach tab navigate to `/coach`. Starting or continuing a session navigates to `/coach/:lessonId` and initializes the existing lesson state.
+- Page routes replace `currentScreen`/`setScreen` as the navigation source of truth. `AppContext` remains responsible for user, lesson, quiz, and scam-check data.
 - Category filters affect only the visible session list; they do not mutate lesson data.
 - Family and settings controls use existing routes and data. No new persistence model is required for this design.
 
@@ -107,8 +125,9 @@ Dorothy, a 72-year-old senior, opens StartHere to decide whether a message is sa
 ## Verification Plan
 
 1. Run the TypeScript check and production build.
-2. Verify Home → Check, Home session preview → Coach session, Coach session → quiz, and Back/Close navigation.
-3. Verify category filters, loading state, empty session list, no trusted contact, quiz feedback, and progress display.
-4. Check the narrow phone layout and full-page desktop layout at 1024–1440 CSS px; confirm there is no simulated phone frame, labels wrap, and no controls are clipped.
-5. Check tap target size, keyboard navigation, visible focus, accessible names, high contrast, and 200% text scaling.
-6. Confirm the app remains usable with local lessons when remote lesson data is unavailable.
+2. Verify route rendering and refresh for `/home`, `/check`, `/check/result`, `/coach`, `/coach/:lessonId`, `/family`, and `/settings`.
+3. Verify tab links, Home session preview → `/coach`, Coach session → quiz route, Browser Back/Forward, and visible Back/Close controls.
+4. Verify category filters, loading state, empty session list, no trusted contact, quiz feedback, and progress display.
+5. Check the narrow phone layout and full-page desktop layout at 1024–1440 CSS px; confirm there is no simulated phone frame, labels wrap, and no controls are clipped.
+6. Check tap target size, keyboard navigation, visible focus, accessible names, high contrast, and 200% text scaling.
+7. Confirm the app remains usable with local lessons when remote lesson data is unavailable.
