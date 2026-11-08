@@ -46,6 +46,7 @@ import {
   isIosStandalonePwa,
   isSafariBrowser,
   markRedirectPending,
+  popupFailureAction,
   SignInFlowError,
 } from '../auth/signInFlow';
 
@@ -138,20 +139,19 @@ export async function signInWithGoogle(): Promise<void> {
     await signInWithPopup(auth, googleProvider);
   } catch (err) {
     const code = firebaseErrorCode(err);
-    const canFallBack = code === 'auth/operation-not-supported-in-this-environment';
-    const popupBlocked = code === 'auth/popup-blocked';
-
     // On Safari the redirect flow returns no user because third-party storage
     // is partitioned, so a second popup tap is the only path that can work.
-    if (popupBlocked && !isSafariBrowser()) {
+    const action = popupFailureAction(code, isSafariBrowser());
+
+    if (action === 'redirect') {
       markRedirectPending(getSessionStorage());
       await signInWithRedirect(auth, googleProvider);
       return;
     }
-    if (canFallBack) {
-      markRedirectPending(getSessionStorage());
-      await signInWithRedirect(auth, googleProvider);
-      return;
+    if (action === 'open-in-safari') {
+      // In-app webviews cannot open a popup, and a redirect there loses its
+      // state the same way Safari does, so send the reader to Safari instead.
+      throw new SignInFlowError('auth/open-in-safari');
     }
     throw err;
   }

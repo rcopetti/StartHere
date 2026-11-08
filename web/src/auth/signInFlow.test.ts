@@ -7,6 +7,7 @@ import {
   isIosStandalonePwa,
   isSafariBrowser,
   markRedirectPending,
+  popupFailureAction,
   signInErrorMessage,
 } from './signInFlow';
 
@@ -67,6 +68,26 @@ test('explains a blocked popup and a broken redirect', () => {
   assert.match(signInErrorMessage('auth/popup-blocked'), /Tap the button again/);
   assert.match(signInErrorMessage('auth/redirect-no-result'), /didn't finish/);
   assert.match(signInErrorMessage('auth/redirect-cancelled-by-user'), /didn't finish/);
+});
+
+test('explains an in-app browser and a lost redirect state', () => {
+  assert.match(signInErrorMessage('auth/open-in-safari'), /Safari/);
+  assert.match(signInErrorMessage('auth/missing-initial-state'), /didn't finish/);
+});
+
+test('never redirects on Safari, where the redirect state cannot survive', () => {
+  assert.equal(
+    popupFailureAction('auth/operation-not-supported-in-this-environment', true),
+    'open-in-safari'
+  );
+  assert.equal(popupFailureAction('auth/popup-blocked', true), 'surface-error');
+  assert.equal(popupFailureAction('auth/popup-closed-by-user', true), 'surface-error');
+  assert.equal(popupFailureAction('auth/popup-blocked', false), 'redirect');
+  assert.equal(
+    popupFailureAction('auth/operation-not-supported-in-this-environment', false),
+    'redirect'
+  );
+  assert.equal(popupFailureAction('auth/popup-closed-by-user', false), 'surface-error');
 });
 
 test('keeps the existing sign-in copy for unknown and unset domains', () => {

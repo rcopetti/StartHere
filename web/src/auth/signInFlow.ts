@@ -57,6 +57,27 @@ export class SignInFlowError extends Error {
   }
 }
 
+export type PopupFailureAction = 'redirect' | 'open-in-safari' | 'surface-error';
+
+/**
+ * Decides what to do after signInWithPopup fails. WebKit partitions
+ * third-party storage, so on Safari and every iOS browser a redirect comes
+ * back without its state and the reader sees a dead end. There the only
+ * useful recovery is a second tap, or moving the page into Safari.
+ */
+export function popupFailureAction(
+  code: string | undefined,
+  safariLike: boolean
+): PopupFailureAction {
+  if (code === 'auth/popup-blocked') {
+    return safariLike ? 'surface-error' : 'redirect';
+  }
+  if (code === 'auth/operation-not-supported-in-this-environment') {
+    return safariLike ? 'open-in-safari' : 'redirect';
+  }
+  return 'surface-error';
+}
+
 export function firebaseErrorCode(error: unknown): string | undefined {
   const code = (error as { code?: unknown } | null)?.code;
   return typeof code === 'string' ? code : undefined;
@@ -70,6 +91,10 @@ export function signInErrorMessage(code?: string): string {
       return 'The sign-in window closed before you finished. Nothing was shared. Tap the button to try again.';
     case 'auth/popup-blocked':
       return 'Safari stopped the sign-in window. Tap the button again, and allow pop-ups for StartHere if it asks.';
+    case 'auth/open-in-safari':
+      return "Sign-in can't open inside this app. Open StartHere in Safari, then tap Sign in with Google there.";
+    case 'auth/missing-initial-state':
+      return "The sign-in didn't finish. Please tap the button to try again.";
     case 'auth/web-storage-unsupported':
       return 'Safari is blocking the sign-in memory. Turn off Private Browsing, or open StartHere in a normal Safari window, and try again.';
     case 'auth/network-request-failed':
