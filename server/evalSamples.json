@@ -1,0 +1,182 @@
+[
+  {
+    "id": "scam-01",
+    "expectedVerdict": "likely_scam",
+    "category": "grandparent_bail",
+    "text": "Grandma, it's me! I'm in trouble in Mexico and got arrested after a car accident. Please don't tell mom and dad. My lawyer says I need $2,500 wired via Western Union right now for bail. Call this number immediately."
+  },
+  {
+    "id": "scam-02",
+    "expectedVerdict": "likely_scam",
+    "category": "delivery_fee",
+    "text": "[U.S. Postal Service] We could not deliver your parcel due to an incomplete street address. Please confirm your delivery information and pay the $1.85 redelivery charge here: http://usps-parcel-redelivery-portal.info/update"
+  },
+  {
+    "id": "scam-03",
+    "expectedVerdict": "likely_scam",
+    "category": "toll_violation",
+    "text": "SunPass Violations: You have an outstanding unpaid toll invoice of $12.50. Failure to pay within 24 hours will result in a $50 late fine and suspension of your driver license. Pay now: http://toll-services-express.net"
+  },
+  {
+    "id": "scam-04",
+    "expectedVerdict": "likely_scam",
+    "category": "bank_lockout",
+    "text": "CHASE SECURITY ALERT: Suspicious login from IP 192.168.1.1 in Moscow. Your online account has been temporarily locked. Restore access immediately by confirming your card details: http://chase-security-verify-online.com"
+  },
+  {
+    "id": "scam-05",
+    "expectedVerdict": "likely_scam",
+    "category": "tech_support",
+    "text": "CRITICAL ALERT FROM MICROSOFT WINDOWS: Trojan Spyware detected on your machine! Your personal files, photos, and passwords are being transmitted. Do not restart your computer. Call toll-free Microsoft Support immediately at 1-800-555-0199."
+  },
+  {
+    "id": "scam-06",
+    "expectedVerdict": "likely_scam",
+    "category": "medicare_card",
+    "text": "Official Medicare Department: New plastic chip cards are being issued to prevent identity theft. Your current paper card expires in 5 days. Confirm your Social Security number and pay the $9.95 processing fee: http://medicare-card-replacement.org"
+  },
+  {
+    "id": "scam-07",
+    "expectedVerdict": "likely_scam",
+    "category": "irs_warrant",
+    "text": "Internal Revenue Service Notice: A federal tax lien warrant has been issued in your name for delinquent taxes of $3,450. Federal marshals will arrive at your home within 2 hours unless settled via prepaid debit card immediately. Call Agent Miller now."
+  },
+  {
+    "id": "scam-08",
+    "expectedVerdict": "likely_scam",
+    "category": "lottery_prize",
+    "text": "Congratulations from Publishers Clearing House! You have been selected as the 2nd prize winner of $850,000 and a 2026 Mercedes Benz. To release your cashier check, send the $450 state gaming tax voucher code to claim manager Dave."
+  },
+  {
+    "id": "scam-09",
+    "expectedVerdict": "likely_scam",
+    "category": "geek_squad_invoice",
+    "text": "Geek Squad BestBuy: Thank you for renewing your Total Tech Annual Protection Plan. $499.00 has been debited from your checking account. If you did not authorize this charge or wish to cancel and receive a full refund, call our billing desk immediately at (888) 555-0143."
+  },
+  {
+    "id": "scam-10",
+    "expectedVerdict": "likely_scam",
+    "category": "utility_shutoff",
+    "text": "POWER DISCONNECT WARNING: Your electric service is scheduled for disconnection within 45 minutes due to past due balance of $187.30. Technicians are in your area. To avoid $300 reconnection fee, call 1-844-555-0122 and pay with MoneyPak voucher."
+  },
+  {
+    "id": "scam-11",
+    "expectedVerdict": "likely_scam",
+    "category": "amazon_order",
+    "text": "Amazon Fraud Prevention: An order for Apple iPhone 16 Pro Max ($1,299.00) was placed using your account delivering to Miami, FL. If this was NOT you, contact our security team immediately at 1-855-555-0178 to halt shipment."
+  },
+  {
+    "id": "scam-12",
+    "expectedVerdict": "likely_scam",
+    "category": "ssa_suspension",
+    "text": "Social Security Administration: Your SSN has been suspended due to suspected drug trafficking and money laundering activity found in an abandoned vehicle in Texas. Press 1 to speak with a federal officer before assets are seized."
+  },
+  {
+    "id": "scam-13",
+    "expectedVerdict": "likely_scam",
+    "category": "romance_crypto",
+    "text": "Hi my dearest, I cannot wait until our wedding next month. My uncle who works at the international exchange just informed me of a guaranteed 400% return on Ethereum. Put your savings of $15,000 in this trust wallet and we will retire in Hawaii together."
+  },
+  {
+    "id": "scam-14",
+    "expectedVerdict": "likely_scam",
+    "category": "jury_duty",
+    "text": "County Sheriff's Office: A bench warrant has been signed by Judge Higgins for failure to appear for federal jury selection on Tuesday. You face contempt of court arrest unless an electronic bond of $1,000 is posted at a Coinstar kiosk today."
+  },
+  {
+    "id": "scam-15",
+    "expectedVerdict": "likely_scam",
+    "category": "code_theft",
+    "text": "Hi grandma, this is Google verification. A security test was sent to your phone. Please reply back with the 6-digit code you just received on your screen so I can verify your account."
+  },
+  {
+    "id": "legit-01",
+    "expectedVerdict": "looks_safe",
+    "category": "bank_fraud_alert",
+    "text": "Wells Fargo Fraud Alert: Did you attempt a purchase of $42.50 at TARGET on card ending in 4102? Reply YES if valid, or NO if unauthorized. We will never ask for your PIN, password, or card number by text. To speak with us, call the number printed on the back of your card."
+  },
+  {
+    "id": "legit-02",
+    "expectedVerdict": "looks_safe",
+    "category": "two_factor_code",
+    "text": "839201 is your secure verification code for Apple ID. Do not share this code with anyone. Apple employees will never ask for this code."
+  },
+  {
+    "id": "legit-03",
+    "expectedVerdict": "looks_safe",
+    "category": "medicare_enrollment",
+    "text": "Medicare Reminder: The Annual Open Enrollment Period runs from October 15 through December 7. Visit official Medicare.gov or call 1-800-MEDICARE to review your current 2027 health and prescription coverage options at your convenience."
+  },
+  {
+    "id": "legit-04",
+    "expectedVerdict": "looks_safe",
+    "category": "pharmacy_ready",
+    "text": "CVS Pharmacy: Your prescription for LISINOPRIL 10MG is ready for pickup at 124 Main St. Copay is $4.00. Reply STOP to opt out of pickup reminders."
+  },
+  {
+    "id": "legit-05",
+    "expectedVerdict": "looks_safe",
+    "category": "appointment_reminder",
+    "text": "Reminder: You have a dental cleaning scheduled with Dr. Henderson tomorrow, Thursday Nov 8 at 10:30 AM. Reply 1 to confirm, or call our office at (555) 234-5678 if you need to reschedule."
+  },
+  {
+    "id": "legit-06",
+    "expectedVerdict": "looks_safe",
+    "category": "delivery_completed",
+    "text": "UPS: Your package from Lands' End has been delivered to your front porch. Tracking number 1Z9999999999999999. Thank you for shipping with UPS."
+  },
+  {
+    "id": "legit-07",
+    "expectedVerdict": "looks_safe",
+    "category": "family_chat",
+    "text": "Hi Mom! Tommy scored two goals at soccer practice this afternoon. Hope your garden is doing well. We'll bring Sunday dinner around 5 PM, love you!"
+  },
+  {
+    "id": "legit-08",
+    "expectedVerdict": "looks_safe",
+    "category": "utility_bill",
+    "text": "Duke Energy: Your monthly electric statement is now ready to view at duke-energy.com. Total amount of $94.20 will be auto-debited on Nov 22 per your automatic payment setting."
+  },
+  {
+    "id": "legit-09",
+    "expectedVerdict": "looks_safe",
+    "category": "hospital_checkin",
+    "text": "Memorial Hospital: Online check-in is now open for your appointment with Dr. Miller on Friday Nov 9. Save time at arrival by completing health questions through your MyChart portal at mychart.memorialhealth.org."
+  },
+  {
+    "id": "legit-10",
+    "expectedVerdict": "looks_safe",
+    "category": "library_hold",
+    "text": "Springfield Public Library: The title 'Lessons in Chemistry' you requested is now waiting for you at the front circulation desk. Please pick it up before November 14."
+  },
+  {
+    "id": "legit-11",
+    "expectedVerdict": "looks_safe",
+    "category": "airline_boarding",
+    "text": "Delta Air Lines: Flight DL 1492 from ATL to MCO is on schedule for departure at 2:15 PM from Gate B18. Your mobile boarding pass is available in the Delta app."
+  },
+  {
+    "id": "legit-12",
+    "expectedVerdict": "looks_safe",
+    "category": "streaming_receipt",
+    "text": "Netflix receipt: Your monthly standard plan ($15.49) was successfully processed on your Visa ending in 8832. You can manage your account settings at netflix.com/youraccount."
+  },
+  {
+    "id": "legit-13",
+    "expectedVerdict": "looks_safe",
+    "category": "weather_alert",
+    "text": "National Weather Service: A Freeze Warning is in effect for your county from 1:00 AM to 9:00 AM tomorrow. Protect outdoor plants and bring pets indoors."
+  },
+  {
+    "id": "legit-14",
+    "expectedVerdict": "looks_safe",
+    "category": "church_event",
+    "text": "Grace Community Church: Reminder that the autumn pancake breakfast is this Saturday from 8:00 AM to 11:00 AM in Fellowship Hall. Friends and family are all welcome!"
+  },
+  {
+    "id": "legit-15",
+    "expectedVerdict": "looks_safe",
+    "category": "credit_card_statement",
+    "text": "Chase Alert: Your monthly credit card statement ending in 5521 is now available online. Minimum payment of $25.00 is due on Dec 3. Log in to chase.com to review your statement."
+  }
+]
