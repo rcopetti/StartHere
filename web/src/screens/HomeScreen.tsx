@@ -41,7 +41,7 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
-      <AppHeader title="StartHere" showPersonMenu showSignOut />
+      <AppHeader title="StartHere" />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.intro}>

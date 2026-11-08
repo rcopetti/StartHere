@@ -17,8 +17,6 @@ interface AppHeaderProps {
   showBack?: boolean;
   onBack?: () => void;
   showSettings?: boolean;
-  showPersonMenu?: boolean;
-  showSignOut?: boolean;
   showClose?: boolean;
   onClose?: () => void;
   rightLabel?: string;
@@ -29,8 +27,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   showBack = false,
   onBack,
   showSettings = false,
-  showPersonMenu = false,
-  showSignOut = false,
   showClose = false,
   onClose,
   rightLabel,
@@ -41,7 +37,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutFailed, setSignOutFailed] = useState(false);
-  const isNarrow = width < 360;
+  const isNarrow = width < (showSettings ? 480 : 400);
 
   const getTitleSize = () => {
     switch (fontSize) {
@@ -126,7 +122,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             </View>
           )}
 
-          <View style={[styles.rightSlot, isNarrow && styles.rightSlotNarrow, showSignOut && styles.accountActions]}>
+          <View style={[styles.rightSlot, isNarrow && styles.rightSlotNarrow, styles.accountActions]}>
             {showSettings && (
               <Pressable
                 onPress={() => navigate(ROUTES.settings)}
@@ -139,25 +135,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               >
                 <Settings size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
                 <Text style={[styles.navButtonText, { color: foreground }]}>Aa</Text>
-              </Pressable>
-            )}
-
-            {showPersonMenu && (
-              <Pressable
-                onPress={() => setMenuOpen(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Open family and settings"
-                accessibilityState={{ expanded: menuOpen }}
-                style={({ pressed }: { pressed: boolean }) => [
-                  styles.personButton,
-                  {
-                    borderColor: highContrast ? '#FFFFFF' : '#D5DFDA',
-                    opacity: pressed ? 0.7 : 1,
-                  },
-                ]}
-              >
-                <UserRound size={24} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
-                <Text style={[styles.personLabel, { color: foreground }]}>Family</Text>
               </Pressable>
             )}
 
@@ -175,17 +152,33 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               </Pressable>
             )}
 
-            {showSignOut && (
-              <Pressable
-                onPress={handleSignOut}
-                disabled={signingOut}
-                accessibilityRole="button"
-                accessibilityLabel="Sign out"
-                style={styles.navButton}
-              >
-                <LogOut size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
-              </Pressable>
-            )}
+            <Pressable
+              onPress={() => setMenuOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Open family and settings"
+              accessibilityState={{ expanded: menuOpen }}
+              style={({ pressed }: { pressed: boolean }) => [
+                styles.personButton,
+                {
+                  borderColor: highContrast ? '#FFFFFF' : '#D5DFDA',
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <UserRound size={24} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
+              <Text style={[styles.personLabel, { color: foreground }]}>Family</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={handleSignOut}
+              disabled={signingOut}
+              accessibilityRole="button"
+              accessibilityLabel="Sign out"
+              style={styles.navButton}
+            >
+              <LogOut size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
+            </Pressable>
+
 
             {rightLabel && (
               <Text style={[styles.rightLabelText, { color: foreground }]}>{rightLabel}</Text>

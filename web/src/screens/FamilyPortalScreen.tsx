@@ -23,7 +23,6 @@ export const FamilyPortalScreen: React.FC = () => {
         title="Family Portal"
         showBack
         onBack={() => navigate(ROUTES.home)}
-        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

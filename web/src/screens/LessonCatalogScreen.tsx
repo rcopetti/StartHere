@@ -59,7 +59,6 @@ export const LessonCatalogScreen: React.FC = () => {
         title="Tech Coach"
         showBack
         onBack={() => navigate(ROUTES.home)}
-        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

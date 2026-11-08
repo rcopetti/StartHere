@@ -61,7 +61,6 @@ export const FamilyCircleScreen: React.FC = () => {
         title="Family Circle"
         showBack
         onBack={() => navigate(ROUTES.home)}
-        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>

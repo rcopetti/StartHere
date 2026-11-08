@@ -168,7 +168,6 @@ export const ScamCheckScreen: React.FC = () => {
         title="Scam Check"
         showBack
         onBack={() => navigate(ROUTES.home)}
-        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
