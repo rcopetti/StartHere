@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Modal, useWindowDimensions } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, Modal, useWindowDimensions } from 'react-native';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Settings, UserRound, Users, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -96,6 +96,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 <ChevronLeft size={24} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
                 <Text style={[styles.navButtonText, { color: foreground }]}>Back</Text>
               </Pressable>
+            )}
+            {!showBack && !showClose && (
+              <Image source={{ uri: '/icons/icon-192.png' }} alt="" style={styles.brandMark} />
             )}
           </View>
 
@@ -263,6 +266,10 @@ const styles = StyleSheet.create({
   },
   leftSlotNarrow: {
     width: 'auto',
+  },
+  brandMark: {
+    width: 32,
+    height: 32,
   },
   centerSlot: {
     flex: 1,

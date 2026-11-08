@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -76,9 +76,7 @@ export const SignInScreen: React.FC = () => {
     <View style={[styles.page, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.brandRow}>
-          <View style={styles.brandMark}>
-            <Text style={styles.brandMarkText}>S</Text>
-          </View>
+          <Image source={{ uri: '/icons/icon-192.png' }} alt="" style={styles.brandMark} />
           <Text style={[styles.brandName, { color: foreground }]}>StartHere</Text>
         </View>
 
@@ -161,14 +159,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: '#1E5E3A',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandMarkText: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: '800',
   },
   brandName: {
     fontSize: 24,
