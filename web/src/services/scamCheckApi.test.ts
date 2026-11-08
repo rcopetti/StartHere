@@ -4,8 +4,27 @@ import {
   ScamCheckApiError,
   buildScamCheckForm,
   isScamCheckApiConfigured,
+  resolveScamCheckApiBase,
   scamCheckErrorMessage,
 } from './scamCheckApi';
+
+test('resolves same-origin mode', () => {
+  assert.deepEqual(resolveScamCheckApiBase('/'), { base: '', sameOrigin: true });
+  assert.deepEqual(resolveScamCheckApiBase('same-origin'), { base: '', sameOrigin: true });
+  assert.deepEqual(resolveScamCheckApiBase(' SAME-ORIGIN '), { base: '', sameOrigin: true });
+});
+
+test('resolves an absolute backend URL and trims trailing slashes', () => {
+  assert.deepEqual(resolveScamCheckApiBase('http://localhost:8080/'), {
+    base: 'http://localhost:8080',
+    sameOrigin: false,
+  });
+});
+
+test('reports the API as unconfigured when no value is set', () => {
+  assert.deepEqual(resolveScamCheckApiBase(undefined), { base: '', sameOrigin: false });
+  assert.deepEqual(resolveScamCheckApiBase('  '), { base: '', sameOrigin: false });
+});
 
 test('builds a text form with the unknown channel', () => {
   const form = buildScamCheckForm({ text: '  Your package is on hold.  ' });

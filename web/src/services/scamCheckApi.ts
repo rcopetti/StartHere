@@ -6,7 +6,6 @@
 
 import type { ScamCheckResult } from '../types';
 
-const API_BASE_URL = (import.meta.env?.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
 const REQUEST_TIMEOUT_MS = 30000;
 
 export type ScamCheckChannel =
@@ -17,6 +16,25 @@ export type ScamCheckChannel =
   | 'photo'
   | 'file'
   | 'unknown';
+
+/**
+ * `VITE_API_BASE_URL="/"` (or `same-origin`) keeps requests on the current host,
+ * which the Vite dev proxy forwards to the backend. An absolute URL calls the
+ * backend directly. Empty means the API is not configured.
+ */
+export function resolveScamCheckApiBase(configured?: string): {
+  base: string;
+  sameOrigin: boolean;
+} {
+  const raw = (configured ?? '').trim();
+  if (raw === '/' || raw.toLowerCase() === 'same-origin') {
+    return { base: '', sameOrigin: true };
+  }
+  return { base: raw.replace(/\/+$/, ''), sameOrigin: false };
+}
+
+const API = resolveScamCheckApiBase(import.meta.env?.VITE_API_BASE_URL);
+const API_BASE_URL = API.base;
 
 export interface ScamCheckInput {
   text?: string;
@@ -47,7 +65,7 @@ export class ScamCheckApiError extends Error {
 }
 
 export function isScamCheckApiConfigured(): boolean {
-  return Boolean(API_BASE_URL);
+  return API.sameOrigin || Boolean(API_BASE_URL);
 }
 
 export function buildScamCheckForm(input: ScamCheckInput): FormData {
@@ -78,7 +96,7 @@ export async function checkScamWithApi(
   input: ScamCheckInput,
   idToken: string
 ): Promise<ScamCheckResult> {
-  if (!API_BASE_URL) {
+  if (!isScamCheckApiConfigured()) {
     throw new ScamCheckApiError('not_configured', 'Scam Check API is not configured.');
   }
 

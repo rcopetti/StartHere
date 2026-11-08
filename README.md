@@ -54,9 +54,11 @@ The production build includes the PWA manifest, icons, and service worker. The s
 ### AI configuration
 
 Scam Check calls the FastAPI service in `backend/` whenever `VITE_API_BASE_URL`
-is set. If no API URL is configured, the client uses a deterministic offline
-check that never reports "looks safe" and never holds a provider key. Do not
-embed Gemini or Vertex AI keys in the web client or commit them to the
+is set. `"/"` (the default) keeps requests on the current host; the Vite dev
+server proxies `/api` to `http://localhost:8080`. Use an absolute URL to call the
+API directly. If no API URL is configured, the client uses a deterministic
+offline check that never reports "looks safe" and never holds a provider key. Do
+not embed Gemini or Vertex AI keys in the web client or commit them to the
 repository; provider credentials belong to the backend.
 
 ### Sign-in setup (Firebase Authentication)
@@ -103,8 +105,10 @@ cp .env.example .env
 - Every check requires a Firebase ID token. Configure
   `FIREBASE_CREDENTIALS_PATH`, `FIREBASE_CREDENTIALS_JSON`, or
   `FIREBASE_AUTH_EMULATOR_HOST`.
-- Set `VITE_API_BASE_URL=http://localhost:8080` in the root `.env` to route the
-  web client through the API. Leave it blank to keep the on-device fallback.
+- `VITE_API_BASE_URL="/"` in the root `.env` routes the web client through the
+  API on the same origin; Vite proxies `/api` to `http://localhost:8080`
+  (override the target with `VITE_API_PROXY_TARGET`). Use an absolute URL to
+  call the API directly, or leave it blank to keep the on-device fallback.
 - Endpoints, response schema, and the full variable list:
   [backend/README.md](./backend/README.md).
 
