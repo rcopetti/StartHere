@@ -15,7 +15,7 @@ dependencies = [
   "pydantic-settings>=2.6.0",
   "python-multipart>=0.0.12",
   "litellm>=1.55.0",
-  "firebase-admin>=6.5.0",
+  "pyjwt[crypto]>=2.10.0",
   "pypdf>=5.1.0",
 ]
 

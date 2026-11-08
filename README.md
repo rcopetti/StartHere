@@ -102,9 +102,10 @@ cp .env.example .env
 - `LLM_MODEL` selects the backend through LiteLLM: `gemini/gemini-2.5-flash`,
   `bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0`, `ollama/llama3.2`, and so on.
   `LLM_FALLBACK_MODELS` adds a fallback chain.
-- Every check requires a Firebase ID token. Configure
-  `FIREBASE_CREDENTIALS_PATH`, `FIREBASE_CREDENTIALS_JSON`, or
-  `FIREBASE_AUTH_EMULATOR_HOST`.
+- Every check requires a Firebase ID token. Set `FIREBASE_PROJECT_ID` in
+  `backend/.env` to the same value as `VITE_FIREBASE_PROJECT_ID`; verification
+  uses Google's public signing keys and needs no service account.
+  `FIREBASE_AUTH_EMULATOR_HOST` is optional for local emulator testing.
 - `VITE_API_BASE_URL="/"` in the root `.env` routes the web client through the
   API on the same origin; Vite proxies `/api` to `http://localhost:8080`
   (override the target with `VITE_API_PROXY_TARGET`). Use an absolute URL to

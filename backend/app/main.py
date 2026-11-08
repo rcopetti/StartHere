@@ -53,6 +53,12 @@ def create_app(
     app.state.llm_client = llm_client
     app.state.scam_check_service = ScamCheckService(llm_client, settings)
 
+    logger.info(
+        "firebase_auth_configured project=%s emulator=%s",
+        settings.firebase_project_id or "(missing)",
+        bool(settings.firebase_auth_emulator_host),
+    )
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

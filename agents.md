@@ -423,7 +423,7 @@ client calls it with the user's Firebase ID token when `VITE_API_BASE_URL` is se
 
 ```
 backend/
-  pyproject.toml              # FastAPI, LiteLLM, firebase-admin, pypdf
+  pyproject.toml              # FastAPI, LiteLLM, PyJWT, pypdf
   .env.example                # every supported knob
   app/
     main.py                   # app factory, CORS, error envelope, request ids
@@ -447,8 +447,9 @@ backend/
   `bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0`, `ollama/llama3.2`).
   `LLM_FALLBACK_MODELS` is a comma-separated fallback chain.
 - **Auth**: every `/api/v1/scam-check*` request needs a Firebase ID token.
-  Configure `FIREBASE_CREDENTIALS_PATH`, `FIREBASE_CREDENTIALS_JSON`, or
-  `FIREBASE_AUTH_EMULATOR_HOST`.
+  Set `FIREBASE_PROJECT_ID` to the web client's project; verification uses
+  Google's Firebase JWKS and needs no service account.
+  `FIREBASE_AUTH_EMULATOR_HOST` is optional for the local emulator.
 - **Fail closed**: provider errors and unusable JSON return `503 check_unavailable`;
   never emit an unverified verdict.
 - **Privacy**: never log message text, file text, or screenshots. The service

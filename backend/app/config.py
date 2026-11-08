@@ -50,8 +50,6 @@ class Settings(BaseSettings):
     llm_max_repair_attempts: int = 1
 
     firebase_project_id: str | None = None
-    firebase_credentials_json: SecretStr | None = None
-    firebase_credentials_path: str | None = None
     firebase_auth_emulator_host: str | None = None
 
     max_text_chars: int = 20_000
@@ -64,8 +62,6 @@ class Settings(BaseSettings):
         "llm_api_key",
         "llm_api_base",
         "firebase_project_id",
-        "firebase_credentials_path",
-        "firebase_credentials_json",
         "firebase_auth_emulator_host",
         mode="before",
     )

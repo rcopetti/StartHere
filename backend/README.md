@@ -82,19 +82,28 @@ models spend tokens before writing the JSON reply, so keep
 ## Firebase authentication
 
 Every `/api/v1/scam-check*` request needs `Authorization: Bearer <Firebase ID token>`.
-The server validates signature, issuer, audience, and expiry with the Firebase
-Admin SDK.
+The server verifies the RS256 signature against Google's Firebase JWKS, then
+checks audience, issuer, expiry, and subject. Revocation is not checked.
 
-Pick one credential source:
+**`FIREBASE_PROJECT_ID` is required** and must match `VITE_FIREBASE_PROJECT_ID`
+in the web client. Verification uses Google's public signing keys, so no service
+account or Application Default Credentials are needed.
 
 | Variable | Use |
 |---|---|
-| `FIREBASE_CREDENTIALS_PATH` | Path to a service-account JSON file |
-| `FIREBASE_CREDENTIALS_JSON` | The service-account JSON itself (for secret managers) |
-| `FIREBASE_AUTH_EMULATOR_HOST` | Local Auth emulator, e.g. `127.0.0.1:9099` |
+| `FIREBASE_PROJECT_ID` | **Required.** Same project the web client signs in with |
+| `FIREBASE_AUTH_EMULATOR_HOST` | Optional. Local Auth emulator, e.g. `127.0.0.1:9099` |
 
-`FIREBASE_PROJECT_ID` is required when the service account does not imply it.
-Without any of these, check requests return `503 auth_unavailable`.
+If the project ID is missing, check requests return `503 auth_unavailable`. If a
+token is rejected, the server logs a `firebase_token_rejected reason=...` line;
+a wrong project shows up as an audience mismatch there.
+
+The emulator issues unsigned tokens. That acceptance path is enabled only when
+`FIREBASE_AUTH_EMULATOR_HOST` is set, and it still checks audience, issuer, and
+expiry.
+
+If you later need Firestore access or revocation checks, add the Firebase Admin
+SDK and a service account; the scam-check path does not require either.
 
 ---
 
