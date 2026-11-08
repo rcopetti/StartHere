@@ -2,7 +2,86 @@
 
 **Empowering seniors with patient, jargon-free technology coaching and real-time scam protection.**
 
-StartHere is designed specifically for older adults and their family circle. It combines an accessible, voice-enabled AI coach that explains technology step-by-step with an instant Scam Check tool and a family safety alert network.
+StartHere is designed specifically for older adults and their family circle. It combines accessible, plain-language technology coaching with an instant Scam Check tool and a family safety alert network.
+
+---
+
+## Run as a Web App
+
+The StartHere client is a **React Native Web** app served by Vite. This repository does not contain a native iOS or Android project; the web client is the runnable app.
+
+### Prerequisites
+
+- **Node.js 24.12.0 or newer** (required by the resolved Firebase packages)
+- **npm**
+
+If you use `nvm`:
+
+```bash
+nvm install 24.12.0
+nvm use 24.12.0
+```
+
+### Install dependencies
+
+```bash
+npm install --legacy-peer-deps
+```
+
+`--legacy-peer-deps` is required because the current manifest's Vite/esbuild peer range conflicts.
+
+### Start the development server
+
+```bash
+npm run dev
+```
+
+Open **http://localhost:3000/**.
+
+Vite also prints a Network URL. Use it to open the app on a phone on the same network, or use an HTTPS tunnel such as ngrok when testing PWA installation.
+
+### Build and preview the production app
+
+```bash
+npm run build
+npm run preview
+```
+
+Open **http://localhost:4173/**.
+
+The production build includes the PWA manifest, icons, and service worker. The service worker is registered only in production builds.
+
+### AI configuration
+
+Scam Check and Coach still run without an AI key and use their local fallback behavior. For production, route AI calls through the Cloud Functions described in [the specification](./docs/SPECIFICATION.md); do not embed Gemini or Vertex AI keys in the web client or commit them to the repository.
+
+### Verify the app
+
+```bash
+npm run lint
+node --import tsx --test web/src/navigation/routes.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
+```
+
+### Install as a PWA
+
+The web client includes standalone display metadata, PWA icons, safe-area handling for notched phones, and a production service worker.
+
+- **iPhone/iPad Safari:** Share → **Add to Home Screen**
+- **Android Chrome:** menu → **Add to Home screen** / **Install app**
+
+If you change the manifest or app icon, remove and re-add the home-screen app because mobile operating systems cache those assets.
+
+### Main routes
+
+| Route | Screen |
+|---|---|
+| `/home` | Guided Home |
+| `/check` | Scam Check input |
+| `/check/result` | Latest Scam Check result |
+| `/coach` | Coach session list |
+| `/coach/:lessonId` | Session quiz |
+| `/family` | Family Circle |
+| `/settings` | Settings and accessibility |
 
 ---
 
@@ -10,18 +89,16 @@ StartHere is designed specifically for older adults and their family circle. It 
 
 - [Complete Project Specification](./docs/SPECIFICATION.md): Full technical architecture, Cloud Functions, data models, security rules, and evaluation benchmark.
 - [Mobile Caller ID & Call Screening Architecture](./docs/MOBILE_CALLER_ID_APPROACH.md): Platform-specific implementation guide (Android CallScreeningService & iOS CallKit) integrated with StartHere.
-- [Developer Handoff Note](./public/assets/aistudio/HANDOFF_ce82f4b8.md): The original handoff notes from Nov 7, 2026.
+- [Developer Handoff Note](./web/public/assets/aistudio/HANDOFF_ce82f4b8.md): The original handoff notes from Nov 7, 2026.
 
 ---
 
 ## Key Features
 
-1. **Patient Tech Coach (`coachTurn`)**
-   - Step-by-step guided lessons (Thank-you notes, spotting scam links, video calls) and open Q&A.
-   - Pre-Gemini sensitive number guard (SSNs, passwords, and cards intercepted before AI).
-   - Jargon blocklist with automatic plain-language retry.
-   - Responses clamped to 1–2 short, friendly sentences.
-   - Senior-friendly voice dictation (`MicButton`) and text-to-speech audio playback.
+1. **Patient Tech Coach**
+   - A session list with short, scenario-based quizzes covering phone basics, everyday tasks, and scam safety.
+   - One question at a time with plain-language explanations and calm feedback.
+   - Pre-Gemini sensitive number guard for SSNs, card numbers, and passwords.
 
 2. **Instant Scam Check (`scamCheck`)**
    - Text message and screenshot scam analyzer powered by Gemini Flash (temp 0.1).
@@ -45,12 +122,22 @@ StartHere is designed specifically for older adults and their family circle. It 
 
 ```
 ├── docs/
-│   ├── SPECIFICATION.md          # Full technical spec & architecture
-│   └── MOBILE_CALLER_ID_APPROACH.md # Mobile caller ID & screening architecture
-├── README.md                     # Project overview and run guide
-├── public/
-│   └── assets/aistudio/          # Handoff assets & developer notes
-├── src/                          # Client application
-├── metadata.json                 # AI Studio applet configuration
-└── package.json                  # Project dependencies and scripts
+│   ├── SPECIFICATION.md                  # Full technical spec & architecture
+│   ├── MOBILE_CALLER_ID_APPROACH.md      # Mobile caller ID & screening architecture
+│   └── superpowers/                      # Design specs and implementation plans
+├── web/
+│   ├── index.html                        # Web shell and PWA metadata
+│   ├── public/
+│   │   ├── manifest.webmanifest          # PWA manifest
+│   │   ├── sw.js                         # Production service worker
+│   │   └── icons/                        # PWA and Apple touch icons
+│   └── src/
+│       ├── navigation/                   # React Router routes and helpers
+│       ├── components/                   # AppShell, BottomTabs, AppHeader, BigButton
+│       ├── screens/                      # Home, Check, Coach, Family, Settings
+│       ├── context/                      # App state and Firebase sync
+│       └── services/                     # Gemini and Firebase services
+├── vite.config.ts                        # Vite, React Native Web aliasing, public assets
+├── package.json                          # Dependencies and scripts
+└── README.md                             # Project overview and run guide
 ```
