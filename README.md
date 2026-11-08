@@ -76,7 +76,38 @@ The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-b
 
 ```bash
 npm run lint
-node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
+node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts web/src/services/scamCheckApi.test.ts
+```
+
+### Scam Check API (FastAPI backend)
+
+`backend/` is a stateless FastAPI service that performs the scam check
+server-side, so the model choice and provider keys never reach the browser. It
+accepts typed text, a photo, or a PDF/DOCX/TXT file.
+
+```bash
+cd backend
+python3 -m venv .venv
+.venv/bin/pip install -e ".[dev]"
+cp .env.example .env
+.venv/bin/uvicorn app.main:app --reload --port 8080
+```
+
+- `LLM_MODEL` selects the backend through LiteLLM: `gemini/gemini-2.5-flash`,
+  `bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0`, `ollama/llama3.2`, and so on.
+  `LLM_FALLBACK_MODELS` adds a fallback chain.
+- Every check requires a Firebase ID token. Configure
+  `FIREBASE_CREDENTIALS_PATH`, `FIREBASE_CREDENTIALS_JSON`, or
+  `FIREBASE_AUTH_EMULATOR_HOST`.
+- Set `VITE_API_BASE_URL=http://localhost:8080` in the root `.env` to route the
+  web client through the API. Leave it blank to keep the on-device fallback.
+- Endpoints, response schema, and the full variable list:
+  [backend/README.md](./backend/README.md).
+
+```bash
+cd backend
+.venv/bin/pytest
+.venv/bin/ruff check .
 ```
 
 ### Scam Check benchmark
@@ -164,6 +195,10 @@ If you change the manifest or app icon, remove and re-add the home-screen app be
 ## Project Structure
 
 ```
+├── backend/                              # FastAPI Scam Check service (Python, LiteLLM)
+│   ├── app/                              # routes, services, prompts, models
+│   ├── tests/                            # pytest suite
+│   └── README.md                         # provider, auth, and endpoint reference
 ├── docs/
 │   ├── SPECIFICATION.md                  # Full technical spec & architecture
 │   ├── MOBILE_CALLER_ID_APPROACH.md      # Mobile caller ID & screening architecture

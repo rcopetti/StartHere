@@ -32,9 +32,31 @@ import {
   seedLessonsIfEmpty,
   saveCoachSession,
   saveScamCheckRecord,
+  auth,
 } from '../services/firebase';
 import { analyzeScamCheck } from '../services/gemini';
+import { checkScamWithApi, isScamCheckApiConfigured } from '../services/scamCheckApi';
 import { resolveAuthStage, type AuthStage } from '../auth/authState';
+
+/**
+ * Prefer the StartHere API so the model choice and provider keys stay on the
+ * server. If it is not configured or unreachable, fall back to the on-device check.
+ */
+async function requestScamCheck(input: {
+  text?: string;
+  imageBase64?: string;
+  imageMime?: string;
+}): Promise<ScamCheckResult> {
+  if (isScamCheckApiConfigured() && auth.currentUser) {
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      return await checkScamWithApi(input, idToken);
+    } catch (error) {
+      console.warn('Scam Check API unavailable; using the on-device check.', error);
+    }
+  }
+  return analyzeScamCheck(input);
+}
 
 interface AppContextType {
   user: UserProfile | null;
@@ -335,7 +357,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const runScamCheck = async (input: { text?: string; imageBase64?: string; imageMime?: string }) => {
-    const result = await analyzeScamCheck(input);
+    const result = await requestScamCheck(input);
     setActiveScamResult(result);
 
     if (user) {
