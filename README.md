@@ -6,6 +6,44 @@ StartHere is designed specifically for older adults and their family circle. It 
 
 ---
 
+## MVP Stack
+
+What actually runs in the current MVP.
+
+| Layer | Choice | Notes |
+|---|---|---|
+| **Mobile app** | React Native | Rendered through React Native Web and served by Vite; the same app also installs as a PWA |
+| **Authentication** | Firebase Authentication (Google provider) | No anonymous or demo accounts. Every Scam Check requires a Firebase ID token |
+| **Backend** | FastAPI (Python) | Stateless Scam Check service in `backend/`; no user content or screenshots are persisted |
+| **LLM provider** | Cloudflare Workers AI, via LiteLLM | `@cf/meta/llama-4-scout-17b-16e-instruct` and `@cf/google/gemma-4-26b-a4b-it`; select with `LLM_MODEL` / `LLM_FALLBACK_MODELS` |
+| **MVP server** | Local `uvicorn` on port 8080, forwarded with ngrok | Public URL: **https://carless-almost-brought.ngrok-free.dev** |
+
+```
+React Native app ──HTTPS──▶ FastAPI ──LiteLLM──▶ Cloudflare Workers AI
+        │                      │
+        └─ Firebase Auth ──────┘  (Google sign-in, ID token per request)
+```
+
+### Running the MVP stack locally
+
+```bash
+# 1. Backend (terminal 1)
+cd backend
+.venv/bin/uvicorn app.main:app --reload --port 8080
+
+# 2. Public tunnel (terminal 2)
+ngrok http 8080
+
+# 3. App (terminal 3)
+npm run dev
+```
+
+Then set `VITE_API_BASE_URL` to the ngrok HTTPS URL and add that host to Firebase
+Authentication → **Settings** → **Authorized domains**. The ngrok hostname changes
+every time the tunnel restarts, so update both places after a restart.
+
+---
+
 ## Run as a Web App
 
 The StartHere client is a **React Native Web** app served by Vite. This repository does not contain a native iOS or Android project; the web client is the runnable app.
