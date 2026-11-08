@@ -76,8 +76,32 @@ The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-b
 
 ```bash
 npm run lint
-node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
+node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts scripts/scamcheck-ai.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
 ```
+
+### Scam Check benchmark
+
+`npm run eval:scamcheck` scores the 30-sample set against whichever provider `.env` selects:
+
+| Variable | Values | Default |
+|---|---|---|
+| `SCAMCHECK_AI_PROVIDER` | `gemini`, `ollama`, `heuristic` | `gemini` |
+| `SCAMCHECK_AI_MODEL` | provider model name | `gemini-2.5-flash` / `llama3.2` |
+| `SCAMCHECK_AI_BASE_URL` | custom endpoint | Gemini default / `http://localhost:11434` |
+| `SCAMCHECK_AI_TIMEOUT_MS` | request timeout in ms | `60000` |
+
+```bash
+npm run eval:scamcheck
+```
+
+For a local model, start Ollama and point the runner at it:
+
+```bash
+ollama pull llama3.2
+SCAMCHECK_AI_PROVIDER=ollama SCAMCHECK_AI_MODEL=llama3.2 npm run eval:scamcheck
+```
+
+The runner prints the provider, model, endpoint, and how many samples used a heuristic fallback. It exits non-zero when any AI call fails or when the accuracy thresholds are missed, so a broken key or offline endpoint can no longer masquerade as a passing benchmark.
 
 ### Install as a PWA
 
