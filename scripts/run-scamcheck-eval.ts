@@ -1,7 +1,7 @@
 /**
  * Developer Evaluation Runner: Scam Check Benchmark Suite
  * Evaluates 30 labeled samples (15 scams, 15 legitimate messages)
- * against Gemini Flash and scores recall and specificity.
+ * against the configured AI provider and scores recall and specificity.
  *
  * Benchmark Gating Criteria:
  * - Scam Recall: >= 14/15 (>= 93.3%)
@@ -10,13 +10,18 @@
 
 import fs from 'fs';
 import path from 'path';
-import { GoogleGenAI } from '@google/genai';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import {
+  analyzeWithAi,
+  heuristicVerdict,
+  resolveAiConfig,
+  type AiConfig,
+  type ScamCheckVerdict,
+} from './scamcheck-ai';
 
-dotenv.config();
-
-const apiKey = process.env.GEMINI_API_KEY || '';
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+dotenv.config({ path: path.join(projectRoot, '.env') });
 
 interface TestSample {
   id: string;
@@ -28,6 +33,12 @@ interface TestSample {
   difficulty: string;
   text: string;
   keyRedFlags: string;
+}
+
+interface RunCounters {
+  aiCalls: number;
+  aiFailures: number;
+  heuristicCalls: number;
 }
 
 function parseCSVLine(line: string): string[] {
@@ -51,7 +62,10 @@ function parseCSVLine(line: string): string[] {
 }
 
 function loadDataset(): TestSample[] {
-  const csvPath = path.resolve(process.cwd(), 'foundation/starthere-dev-handoff/scamcheck-testset.csv');
+  const csvPath = path.join(
+    projectRoot,
+    'foundation/starthere-dev-handoff/scamcheck-testset.csv'
+  );
   const raw = fs.readFileSync(csvPath, 'utf8');
   const lines = raw.split(/\r?\n/).filter((l) => l.trim().length > 0);
 
@@ -75,88 +89,51 @@ function loadDataset(): TestSample[] {
   return samples;
 }
 
-async function evaluateSample(sample: TestSample): Promise<{ verdict: string; riskScore: number }> {
-  const systemPrompt = `You are StartHere's Instant Scam Check expert for older adults (seniors).
-Analyze the untrusted message provided and determine if it is:
-1. "likely_scam": High risk of fraud, phishing, theft, or impersonation (riskScore 70-100).
-2. "caution": Ambiguous or unverified sender requiring manual verification (riskScore 35-69).
-3. "looks_safe": Standard routine, legitimate communication (riskScore 0-34).
-
-Output JSON adhering strictly to:
-{
-  "verdict": "likely_scam" | "caution" | "looks_safe",
-  "headline": string,
-  "explanation": string,
-  "action": string,
-  "signals": string[],
-  "riskScore": number
-}`;
+async function evaluateSample(
+  sample: TestSample,
+  config: AiConfig,
+  counters: RunCounters
+): Promise<ScamCheckVerdict> {
+  if (config.provider === 'heuristic') {
+    counters.heuristicCalls += 1;
+    return heuristicVerdict(sample.text, sample.category);
+  }
 
   try {
-    if (ai) {
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: `<<<BEGIN UNTRUSTED USER CONTENT>>>\n${sample.text}\n<<<END UNTRUSTED USER CONTENT>>>`,
-        config: {
-          systemInstruction: systemPrompt,
-          temperature: 0.1,
-          responseMimeType: 'application/json',
-        },
-      });
-
-      const parsed = JSON.parse(response.text || '{}');
-      const verdict = parsed.verdict || (parsed.riskScore >= 70 ? 'likely_scam' : parsed.riskScore >= 35 ? 'caution' : 'looks_safe');
-      return { verdict, riskScore: parsed.riskScore || 0 };
-    }
-  } catch (err) {
-    // Fall through to heuristic fallback
+    const result = await analyzeWithAi(config, sample.text);
+    counters.aiCalls += 1;
+    return result;
+  } catch (error) {
+    counters.aiFailures += 1;
+    counters.heuristicCalls += 1;
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[${sample.id}] AI call failed (${config.provider}/${config.model}): ${message}`);
+    return heuristicVerdict(sample.text, sample.category);
   }
-    // Offline / fallback heuristic
-    const lower = sample.text.toLowerCase();
-    const isLegitExplicit = lower.includes('never ask') || lower.includes('stop to opt out') || lower.includes('g-');
-    const isScam =
-      !isLegitExplicit &&
-      (lower.includes('locked') ||
-        lower.includes('$1.99') ||
-        lower.includes('gift card') ||
-        lower.includes('warrant') ||
-        lower.includes('suspended') ||
-        lower.includes('virus') ||
-        lower.includes('medicare number') ||
-        lower.includes('refund desk') ||
-        lower.includes('western union') ||
-        lower.includes('sweepstakes') ||
-        lower.includes('toll') ||
-        lower.includes('crypto') ||
-        lower.includes('zelle') ||
-        lower.includes('bail') ||
-        lower.includes('wrong number') ||
-        (lower.includes('code') && (lower.includes('send') || lower.includes('read that code'))));
-
-    const isCaution = !isScam && sample.category === 'wrong-number opener';
-    const verdict = isScam ? 'likely_scam' : isCaution ? 'caution' : 'looks_safe';
-
-    return {
-      verdict,
-      riskScore: isScam ? 85 : isCaution ? 45 : 15,
-    };
 }
 
 async function runBenchmark() {
+  const config = resolveAiConfig();
+
   console.log('===============================================================');
   console.log('   STARTHERE SCAM CHECK BENCHMARK EVALUATION (30 SAMPLES)       ');
   console.log('===============================================================\n');
+  console.log(`Provider: ${config.provider} | Model: ${config.model}`);
+  console.log(`Endpoint: ${config.baseUrl || 'provider default'}\n`);
 
   const dataset = loadDataset();
-  console.log(`Loaded ${dataset.length} labeled samples (15 scam, 15 legit).\n`);
-
-  let scamHits = 0;
-  let legitHits = 0;
   const totalScams = dataset.filter((s) => s.label === 'scam').length;
   const totalLegit = dataset.filter((s) => s.label === 'legit').length;
+  console.log(
+    `Loaded ${dataset.length} labeled samples (${totalScams} scam, ${totalLegit} legit).\n`
+  );
+
+  const counters: RunCounters = { aiCalls: 0, aiFailures: 0, heuristicCalls: 0 };
+  let scamHits = 0;
+  let legitHits = 0;
 
   for (const sample of dataset) {
-    const { verdict, riskScore } = await evaluateSample(sample);
+    const { verdict, riskScore } = await evaluateSample(sample, config, counters);
     const passed = sample.acceptable.includes(verdict);
 
     if (sample.label === 'scam' && (verdict === 'likely_scam' || verdict === 'caution')) {
@@ -188,13 +165,30 @@ async function runBenchmark() {
       legitHits >= 12 ? '✅ PASSED' : '❌ FAILED'
     }`
   );
+  console.log(
+    `AI calls: ${counters.aiCalls} | Heuristic fallbacks: ${counters.heuristicCalls} | AI failures: ${counters.aiFailures}`
+  );
   console.log('===============================================================\n');
+
+  if (counters.aiFailures > 0) {
+    console.error(
+      'AI failures occurred. The scores above include heuristic fallbacks and are not a valid model benchmark.'
+    );
+    process.exitCode = 1;
+  }
 
   if (scamHits >= 14 && legitHits >= 12) {
     console.log('🎉 BENCHMARK SUITE PASSED ALL ACCURACY CRITERIA!');
   } else {
     console.log('⚠️ BENCHMARK SUITE DID NOT MEET ALL THRESHOLDS.');
+    process.exitCode = 1;
   }
 }
 
-runBenchmark();
+runBenchmark().catch((error) => {
+  console.error(
+    '\nBenchmark could not run:',
+    error instanceof Error ? error.message : error
+  );
+  process.exitCode = 1;
+});
