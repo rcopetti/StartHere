@@ -15,7 +15,7 @@ What actually runs in the current MVP.
 | **Mobile app** | React Native | Rendered through React Native Web and served by Vite; the same app also installs as a PWA |
 | **Authentication** | Firebase Authentication (Google provider) | No anonymous or demo accounts. Every Scam Check requires a Firebase ID token |
 | **Backend** | FastAPI (Python) | Stateless Scam Check service in `backend/`; no user content or screenshots are persisted |
-| **LLM provider** | Cloudflare Workers AI, via LiteLLM | `@cf/meta/llama-4-scout-17b-16e-instruct` and `@cf/google/gemma-4-26b-a4b-it`; select with `LLM_MODEL` / `LLM_FALLBACK_MODELS` |
+| **LLM provider** | Cloudflare Workers AI, via LiteLLM | `@cf/meta/llama-4-scout-17b-16e-instruct`; select with `LLM_MODEL` / `LLM_FALLBACK_MODELS` |
 | **MVP server** | Local `uvicorn` on port 8080, forwarded with ngrok | Public URL: **https://carless-almost-brought.ngrok-free.dev** |
 
 ```
