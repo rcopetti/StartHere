@@ -7,9 +7,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Bot } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { ScenarioDeviceCard } from '../components/ScenarioDeviceCard';
 import { ROUTES } from '../navigation/routes';
 
@@ -64,12 +66,12 @@ export const ScenarioLessonScreen: React.FC = () => {
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 17;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 19;
+        return 22;
     }
   };
 
@@ -90,13 +92,12 @@ export const ScenarioLessonScreen: React.FC = () => {
           exitLesson();
           navigate(ROUTES.coach);
         }}
-        rightLabel={`Q ${currentNum}/${totalSteps}`}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={[styles.lessonName, { color: highContrast ? '#CBD5E1' : '#52605F' }]}>
+        <Heading level={1} style={styles.lessonName} color={highContrast ? '#CBD5E1' : '#52605F'}>
           {activeLesson.title}
-        </Text>
+        </Heading>
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
@@ -106,7 +107,7 @@ export const ScenarioLessonScreen: React.FC = () => {
           <Text
             style={[
               styles.progressText,
-              { color: highContrast ? '#CBD5E1' : '#64748B' },
+              { color: highContrast ? '#CBD5E1' : '#475569' },
             ]}
           >
             Question {currentNum} of {totalSteps}
@@ -121,7 +122,8 @@ export const ScenarioLessonScreen: React.FC = () => {
 
             {/* Question Prompt */}
             <View style={styles.questionPromptBox}>
-              <Text
+              <Heading
+                level={2}
                 style={[
                   styles.questionPromptText,
                   {
@@ -130,8 +132,8 @@ export const ScenarioLessonScreen: React.FC = () => {
                   },
                 ]}
               >
-                ❓ Does this look safe, or could it be a scam?
-              </Text>
+                Does this look safe, or could it be a scam?
+              </Heading>
             </View>
 
             {/* Option A: Legit */}
@@ -140,7 +142,7 @@ export const ScenarioLessonScreen: React.FC = () => {
                 label="Looks safe"
                 variant="outline"
                 onPress={() => answerScenario('legit')}
-                minHeight={58}
+                minHeight={64}
               />
             </View>
 
@@ -150,7 +152,7 @@ export const ScenarioLessonScreen: React.FC = () => {
                 label="This is a scam"
                 variant="outline"
                 onPress={() => answerScenario('scam')}
-                minHeight={58}
+                minHeight={64}
               />
             </View>
           </View>
@@ -210,9 +212,9 @@ export const ScenarioLessonScreen: React.FC = () => {
               ]}
             >
               <View style={styles.coachTitleRow}>
-                <Text style={styles.coachEmoji}>🤖</Text>
+                <Bot size={24} strokeWidth={2.2} color={highContrast ? '#FFFFFF' : '#18334D'} aria-hidden="true" focusable="false" />
                 <Text style={[styles.coachHeading, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-                  PATIENT COACH EXPLANATION:
+                  Coach explanation
                 </Text>
               </View>
 
@@ -289,7 +291,7 @@ export const ScenarioLessonScreen: React.FC = () => {
                 label={isLastQuestion ? 'FINISH LESSON & SEE SCORE 🎉' : `NEXT QUESTION ➔ (${currentNum + 1} of ${totalSteps})`}
                 variant="primary"
                 onPress={handleNext}
-                minHeight={58}
+                minHeight={64}
               />
             </View>
           </View>
@@ -321,9 +323,8 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   lessonName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.3,
     marginBottom: 8,
   },
   progressContainer: {
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   progressText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'right',
   },
@@ -372,7 +373,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   feedbackBannerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
     textAlign: 'center',
     letterSpacing: 0.2,
@@ -393,14 +394,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  coachEmoji: {
-    fontSize: 24,
-    marginRight: 8,
-  },
   coachHeading: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    marginLeft: 8,
   },
   coachBody: {
     fontWeight: '500',
@@ -412,9 +409,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   signalsHeading: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
     marginBottom: 10,
   },
   bulletRow: {
@@ -423,7 +419,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   bulletDot: {
-    color: '#64748B',
+    color: '#475569',
     fontSize: 18,
     marginRight: 8,
     lineHeight: 22,
@@ -437,9 +433,8 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   safeActionHeading: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
     marginBottom: 6,
   },
   safeActionText: {

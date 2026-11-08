@@ -32,12 +32,12 @@ export const BigButton: React.FC<BigButtonProps> = ({
   const getFontSize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 

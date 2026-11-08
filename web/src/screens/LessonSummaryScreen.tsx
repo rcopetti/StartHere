@@ -6,9 +6,11 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { PartyPopper } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { ROUTES } from '../navigation/routes';
 
 export const LessonSummaryScreen: React.FC = () => {
@@ -22,12 +24,12 @@ export const LessonSummaryScreen: React.FC = () => {
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
@@ -37,19 +39,18 @@ export const LessonSummaryScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
-      <AppHeader title="Lesson Completed!" />
+      <AppHeader
+        title="Lesson Completed!"
+        showBack
+        onBack={() => navigate(ROUTES.coach)}
+      />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.celebrateHeader}>
-          <Text style={styles.celebrateEmoji}>🎉</Text>
-          <Text
-            style={[
-              styles.celebrateTitle,
-              { color: highContrast ? '#FFFFFF' : '#0F172A' },
-            ]}
-          >
-            Great Job, {firstName}!
-          </Text>
+          <PartyPopper size={48} strokeWidth={2} color="#B45309" aria-hidden="true" focusable="false" />
+          <Heading level={1} style={styles.celebrateTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+            Great job, {firstName}!
+          </Heading>
           <Text
             style={[
               styles.lessonFinishedName,
@@ -133,7 +134,7 @@ export const LessonSummaryScreen: React.FC = () => {
             label="PRACTICE ANOTHER TOPIC  ➔"
             variant="primary"
             onPress={() => navigate(ROUTES.coach)}
-            minHeight={56}
+            minHeight={64}
           />
 
           <View style={{ marginTop: 10 }}>
@@ -141,7 +142,7 @@ export const LessonSummaryScreen: React.FC = () => {
               label="RETURN TO HOME SCREEN"
               variant="outline"
               onPress={() => navigate(ROUTES.home)}
-              minHeight={52}
+              minHeight={64}
             />
           </View>
         </View>
@@ -162,14 +163,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 14,
   },
-  celebrateEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
-  },
   celebrateTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',
+    lineHeight: 37,
     textAlign: 'center',
+    marginTop: 10,
     marginBottom: 6,
     letterSpacing: -0.4,
   },
@@ -191,7 +190,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   scoreSubtitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 22,
@@ -208,7 +207,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   takeawaysTitle: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '800',
     letterSpacing: 0.4,
     marginBottom: 12,

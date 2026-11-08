@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { ROUTES } from '../navigation/routes';
 import type { LessonDocument, LessonTrack } from '../types';
 
@@ -35,12 +36,12 @@ export const LessonCatalogScreen: React.FC = () => {
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
@@ -63,12 +64,9 @@ export const LessonCatalogScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.intro}>
-          <Text style={[styles.eyebrow, { color: highContrast ? '#CBD5E1' : '#52605F' }]}>
-            TECH COACH
-          </Text>
-          <Text style={[styles.title, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+          <Heading level={1} style={styles.title} color={highContrast ? '#FFFFFF' : '#17212B'}>
             Choose a short practice.
-          </Text>
+          </Heading>
           <Text
             style={[
               styles.subtitle,
@@ -92,7 +90,7 @@ export const LessonCatalogScreen: React.FC = () => {
                 onPress={() => setFilter(item.id)}
                 accessibilityRole="button"
                 accessibilityLabel={item.label}
-                accessibilityState={{ selected: isSelected }}
+                aria-pressed={isSelected}
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.chip,
                   {
@@ -126,9 +124,9 @@ export const LessonCatalogScreen: React.FC = () => {
 
         {loading && allLessons.length === 0 && (
           <View style={styles.emptyCard}>
-            <Text style={[styles.emptyTitle, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+            <Heading level={2} style={styles.emptyTitle} color={highContrast ? '#FFFFFF' : '#17212B'}>
               Getting your sessions ready…
-            </Text>
+            </Heading>
             <Text style={styles.emptySubtitle}>This will only take a moment.</Text>
           </View>
         )}
@@ -143,9 +141,9 @@ export const LessonCatalogScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={[styles.emptyTitle, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+            <Heading level={2} style={styles.emptyTitle} color={highContrast ? '#FFFFFF' : '#17212B'}>
               Nothing to practice here yet.
-            </Text>
+            </Heading>
             <Text style={styles.emptySubtitle}>
               You can still check a message if something seems off.
             </Text>
@@ -220,16 +218,10 @@ const styles = StyleSheet.create({
   intro: {
     marginBottom: 18,
   },
-  eyebrow: {
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    marginBottom: 6,
-  },
   title: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: '800',
-    lineHeight: 34,
+    lineHeight: 37,
     marginBottom: 8,
   },
   subtitle: {
@@ -249,7 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   chipText: {
-    fontSize: 16,
+    fontSize: 18,
   },
   sessionCard: {
     borderRadius: 22,
@@ -270,26 +262,24 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   trackLabel: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
   },
   metaLabel: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
   },
   sessionTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
-    lineHeight: 26,
+    lineHeight: 29,
     marginBottom: 6,
   },
   sessionGoal: {
     marginBottom: 10,
   },
   sessionLink: {
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: '800',
     paddingVertical: 8,
   },
@@ -302,14 +292,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   emptyTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
     marginBottom: 6,
   },
   emptySubtitle: {
-    fontSize: 18,
-    color: '#52605F',
-    lineHeight: 24,
+    fontSize: 20,
+    color: '#475569',
+    lineHeight: 27,
   },
   emptyAction: {
     marginTop: 14,

@@ -9,10 +9,13 @@ export const AppShell: React.FC = () => {
 
   return (
     <View style={styles.page}>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <View style={styles.appColumn}>
-        <View style={styles.content}>
+        <main id="main-content" className="app-main">
           <Outlet />
-        </View>
+        </main>
         {shouldShowTabs(pathname) && <BottomTabs />}
       </View>
     </View>
@@ -34,10 +37,5 @@ const styles = StyleSheet.create({
     maxWidth: 860,
     alignSelf: 'center',
     backgroundColor: '#FAF8F5',
-  },
-  content: {
-    flex: 1,
-    minHeight: 0,
-    overflow: 'hidden',
   },
 });

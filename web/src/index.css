@@ -28,3 +28,97 @@ body {
   background: #faf8f5;
   overscroll-behavior-y: none;
 }
+
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: -120px;
+  z-index: 1000;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: #18334d;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: top 150ms ease;
+}
+
+.skip-link:focus {
+  top: calc(var(--safe-area-top) + 12px);
+}
+
+.bottom-tabs {
+  display: flex;
+  border-top: 1px solid #d9dfda;
+  background: #ffffff;
+  padding: 6px 8px 14px;
+}
+
+.bottom-tab {
+  flex: 1;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+  border-radius: 14px;
+  color: #435159;
+  text-decoration: none;
+}
+
+.bottom-tab[aria-current="page"] {
+  background: #e4eee6;
+  color: #183e2a;
+}
+
+.bottom-tab__marker {
+  width: 26px;
+  height: 3px;
+  margin-bottom: 4px;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.bottom-tab[aria-current="page"] .bottom-tab__marker {
+  background: #1e5e3a;
+}
+
+.bottom-tab__icon {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-tab__label {
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.bottom-tab[aria-current="page"] .bottom-tab__label {
+  font-weight: 800;
+}
+
+:where(a, button, [role="button"], [role="link"], input, textarea, select):focus-visible {
+  outline: 3px solid #b45309;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #faf8f5;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}

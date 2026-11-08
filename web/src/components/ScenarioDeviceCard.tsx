@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import { ChevronLeft, UserRound } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { ScenarioScene } from '../types';
 
@@ -14,16 +15,18 @@ interface ScenarioDeviceCardProps {
 
 export const ScenarioDeviceCard: React.FC<ScenarioDeviceCardProps> = ({ scene }) => {
   const { fontSize, highContrast } = useApp();
+  const { width } = useWindowDimensions();
+  const isNarrow = width < 360;
 
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 17;
+        return 20;
       case 'extra_large':
-        return 21;
+        return 24;
       case 'large':
       default:
-        return 19;
+        return 22;
     }
   };
 
@@ -38,22 +41,24 @@ export const ScenarioDeviceCard: React.FC<ScenarioDeviceCardProps> = ({ scene })
       ]}
     >
       {/* Top Simulated App Navigation Header */}
-      <View style={styles.headerBar}>
-        <View style={styles.unreadBadge}>
-          <Text style={styles.backChevron}>‹</Text>
-          <Text style={styles.unreadCount}>1049</Text>
-        </View>
+      <View style={[styles.headerBar, isNarrow && styles.headerBarNarrow]}>
+        {!isNarrow && (
+          <View style={styles.unreadBadge}>
+            <ChevronLeft size={18} strokeWidth={2.4} color="#2563EB" aria-hidden="true" focusable="false" />
+            <Text style={styles.unreadCount}>1049</Text>
+          </View>
+        )}
 
         <View style={styles.contactCenter}>
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarIcon}>👤</Text>
+            <UserRound size={20} strokeWidth={2.2} color="#FFFFFF" aria-hidden="true" focusable="false" />
           </View>
           <Text numberOfLines={1} style={styles.senderTitle}>
             {scene.sender} ›
           </Text>
         </View>
 
-        <View style={{ width: 44 }} />
+        {!isNarrow && <View style={{ width: 44 }} />}
       </View>
 
       {/* Subheader info: Channel & Timestamp */}
@@ -95,7 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   headerBar: {
-    height: 72,
+    minHeight: 72,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
@@ -103,6 +108,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  headerBarNarrow: {
+    justifyContent: 'center',
   },
   unreadBadge: {
     flexDirection: 'row',
@@ -112,18 +121,14 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  backChevron: {
-    color: '#2563EB',
-    fontSize: 20,
-    fontWeight: '800',
-    marginRight: 2,
-  },
   unreadCount: {
     color: '#2563EB',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
   },
   contactCenter: {
+    flex: 1,
+    minWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -136,12 +141,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 2,
   },
-  avatarIcon: {
-    fontSize: 18,
-  },
   senderTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#334155',
   },
   timestampContainer: {
@@ -150,9 +152,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   timestampText: {
-    fontSize: 13,
-    color: '#64748B',
-    fontWeight: '500',
+    fontSize: 18,
+    color: '#475569',
+    fontWeight: '600',
   },
   messageContainer: {
     paddingHorizontal: 16,

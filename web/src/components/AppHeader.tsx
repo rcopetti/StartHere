@@ -5,11 +5,12 @@
  */
 
 import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet, Modal } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Modal, useWindowDimensions } from 'react-native';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Settings, UserRound, Users, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ROUTES } from '../navigation/routes';
+import { Heading } from './Heading';
 
 interface AppHeaderProps {
   title: string;
@@ -33,31 +34,45 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   rightLabel,
 }) => {
   const { fontSize, highContrast } = useApp();
+  const { width } = useWindowDimensions();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isNarrow = width < 360;
 
   const getTitleSize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
   const foreground = highContrast ? '#FFFFFF' : '#17212B';
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const go = (path: string) => {
     setMenuOpen(false);
     navigate(path);
   };
 
+  const titleStyle = {
+    color: foreground,
+    fontSize: getTitleSize(),
+    fontWeight: highContrast ? '900' : '800',
+  } as const;
+
   return (
     <>
       <View
+        role="region"
+        aria-label={title}
         style={[
           styles.container,
           {
@@ -66,98 +81,94 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           },
         ]}
       >
-        <View style={styles.leftSlot}>
-          {showBack && onBack && (
-            <Pressable
-              onPress={onBack}
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-              style={({ pressed }: { pressed: boolean }) => [
-                styles.navButton,
-                { opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <ChevronLeft size={24} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
-              <Text style={[styles.navButtonText, { color: foreground }]}>Back</Text>
-            </Pressable>
+        <View style={styles.row}>
+          <View style={[styles.leftSlot, isNarrow && styles.leftSlotNarrow]}>
+            {showBack && onBack && (
+              <Pressable
+                onPress={onBack}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+                style={({ pressed }: { pressed: boolean }) => [
+                  styles.navButton,
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+              >
+                <ChevronLeft size={24} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
+                <Text style={[styles.navButtonText, { color: foreground }]}>Back</Text>
+              </Pressable>
+            )}
+          </View>
+
+          {!isNarrow && (
+            <View style={styles.centerSlot}>
+              <Text numberOfLines={1} style={[styles.titleText, titleStyle]}>
+                {title}
+              </Text>
+            </View>
           )}
+
+          <View style={[styles.rightSlot, isNarrow && styles.rightSlotNarrow]}>
+            {showSettings && (
+              <Pressable
+                onPress={() => navigate(ROUTES.settings)}
+                accessibilityRole="button"
+                accessibilityLabel="Open settings and text size"
+                style={({ pressed }: { pressed: boolean }) => [
+                  styles.navButton,
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+              >
+                <Settings size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
+                <Text style={[styles.navButtonText, { color: foreground }]}>Aa</Text>
+              </Pressable>
+            )}
+
+            {showPersonMenu && (
+              <Pressable
+                onPress={() => setMenuOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Open family and settings"
+                accessibilityState={{ expanded: menuOpen }}
+                style={({ pressed }: { pressed: boolean }) => [
+                  styles.personButton,
+                  {
+                    borderColor: highContrast ? '#FFFFFF' : '#D5DFDA',
+                    opacity: pressed ? 0.7 : 1,
+                  },
+                ]}
+              >
+                <UserRound size={24} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
+                <Text style={[styles.personLabel, { color: foreground }]}>Family</Text>
+              </Pressable>
+            )}
+
+            {showClose && onClose && (
+              <Pressable
+                onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel="Close"
+                style={({ pressed }: { pressed: boolean }) => [
+                  styles.closeButton,
+                  { opacity: pressed ? 0.7 : 1 },
+                ]}
+              >
+                <X size={26} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
+              </Pressable>
+            )}
+
+            {rightLabel && (
+              <Text style={[styles.rightLabelText, { color: foreground }]}>{rightLabel}</Text>
+            )}
+          </View>
         </View>
 
-        <View style={styles.centerSlot}>
-          <Text
-            numberOfLines={1}
-            style={[
-              styles.titleText,
-              {
-                color: foreground,
-                fontSize: getTitleSize(),
-                fontWeight: highContrast ? '900' : '800',
-              },
-            ]}
-          >
-            {title}
-          </Text>
-        </View>
-
-        <View style={styles.rightSlot}>
-          {showSettings && (
-            <Pressable
-              onPress={() => navigate(ROUTES.settings)}
-              accessibilityRole="button"
-              accessibilityLabel="Open settings and text size"
-              style={({ pressed }: { pressed: boolean }) => [
-                styles.navButton,
-                { opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <Settings size={20} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
-              <Text style={[styles.navButtonText, { color: foreground }]}>Aa</Text>
-            </Pressable>
-          )}
-
-          {showPersonMenu && (
-            <Pressable
-              onPress={() => setMenuOpen(true)}
-              accessibilityRole="button"
-              accessibilityLabel="Open family and settings"
-              accessibilityState={{ expanded: menuOpen }}
-              style={({ pressed }: { pressed: boolean }) => [
-                styles.personButton,
-                {
-                  borderColor: highContrast ? '#FFFFFF' : '#D5DFDA',
-                  opacity: pressed ? 0.7 : 1,
-                },
-              ]}
-            >
-              <UserRound size={24} strokeWidth={2.3} color={foreground} aria-hidden="true" focusable="false" />
-              <Text style={[styles.personLabel, { color: foreground }]}>Family</Text>
-            </Pressable>
-          )}
-
-          {showClose && onClose && (
-            <Pressable
-              onPress={onClose}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-              style={({ pressed }: { pressed: boolean }) => [
-                styles.closeButton,
-                { opacity: pressed ? 0.7 : 1 },
-              ]}
-            >
-              <X size={26} strokeWidth={2.4} color={foreground} aria-hidden="true" focusable="false" />
-            </Pressable>
-          )}
-
-          {rightLabel && (
-            <Text style={[styles.rightLabelText, { color: foreground }]}>{rightLabel}</Text>
-          )}
-        </View>
+        {isNarrow && <Text style={[styles.narrowTitle, titleStyle]}>{title}</Text>}
       </View>
 
       <Modal
         visible={menuOpen}
         transparent
-        animationType="fade"
+        animationType={prefersReducedMotion ? 'none' : 'fade'}
         onRequestClose={() => setMenuOpen(false)}
       >
         <View style={styles.backdrop}>
@@ -168,6 +179,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             accessibilityLabel="Close family and settings"
           />
           <View
+            role="dialog"
+            aria-modal
+            accessibilityViewIsModal
             style={[
               styles.menuCard,
               {
@@ -176,7 +190,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               },
             ]}
           >
-            <Text style={[styles.menuTitle, { color: foreground }]}>Family and settings</Text>
+            <Heading level={2} style={styles.menuTitle} color={foreground}>
+              Family and settings
+            </Heading>
             <Pressable
               onPress={() => go(ROUTES.family)}
               accessibilityRole="button"
@@ -231,17 +247,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 72,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+  },
+  row: {
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
   },
   leftSlot: {
     width: 88,
     alignItems: 'flex-start',
     justifyContent: 'center',
+  },
+  leftSlotNarrow: {
+    width: 'auto',
   },
   centerSlot: {
     flex: 1,
@@ -253,6 +274,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
+  rightSlotNarrow: {
+    minWidth: 0,
+  },
   navButton: {
     minHeight: 64,
     minWidth: 64,
@@ -263,11 +287,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   navButtonText: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '700',
   },
   titleText: {
     textAlign: 'center',
+  },
+  narrowTitle: {
+    textAlign: 'center',
+    paddingBottom: 10,
   },
   personButton: {
     minHeight: 64,
@@ -281,7 +309,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   personLabel: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '700',
   },
   closeButton: {
@@ -291,7 +319,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rightLabelText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '700',
   },
   backdrop: {
@@ -309,7 +337,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   menuTitle: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
     marginBottom: 14,
   },
@@ -332,12 +360,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
   },
   menuItemSubtitle: {
-    fontSize: 16,
-    color: '#52605F',
+    fontSize: 18,
+    color: '#475569',
     marginTop: 2,
   },
   menuClose: {
@@ -346,7 +374,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuCloseText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
   },
 });

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { ROUTES } from '../navigation/routes';
 
 export const ScamCheckScreen: React.FC = () => {
@@ -22,12 +23,12 @@ export const ScamCheckScreen: React.FC = () => {
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 17;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 19;
+        return 22;
     }
   };
 
@@ -63,15 +64,15 @@ export const ScamCheckScreen: React.FC = () => {
   // Sample presets for senior convenience
   const presets = [
     {
-      label: '📦 USPS $1.99 Delivery Fee',
+      label: 'USPS $1.99 delivery fee',
       text: 'USPS: Your package is on hold due to an unpaid $1.99 redelivery fee. Pay within 12 hours: usps-redeliver.example.com',
     },
     {
-      label: '💬 WhatsApp 6-digit Code',
+      label: 'WhatsApp 6-digit code',
       text: 'WhatsApp: We received a request to reset your PIN. Please send the 6-digit code to verify this request.',
     },
     {
-      label: '🏥 CVS Pharmacy Pickup',
+      label: 'CVS pharmacy pickup',
       text: 'CVS: Your prescription for Lisinopril is ready for pickup at 450 Main St. Store hours today until 8:00 PM.',
     },
   ];
@@ -79,7 +80,7 @@ export const ScamCheckScreen: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
-        title="🛡️ Scam Check"
+        title="Scam Check"
         showBack
         onBack={() => navigate(ROUTES.home)}
         showPersonMenu
@@ -87,14 +88,9 @@ export const ScamCheckScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
-          <Text
-            style={[
-              styles.screenTitle,
-              { color: highContrast ? '#FFFFFF' : '#0F172A' },
-            ]}
-          >
-            Check a Suspicious Message
-          </Text>
+          <Heading level={1} style={styles.screenTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+            Check a suspicious message
+          </Heading>
           <Text
             style={[
               styles.screenSubtitle,
@@ -118,14 +114,13 @@ export const ScamCheckScreen: React.FC = () => {
             },
           ]}
         >
-          <Text
-            style={[
-              styles.cardSectionTitle,
-              { color: highContrast ? '#FFFFFF' : '#0F172A' },
-            ]}
+          <Heading
+            level={2}
+            style={styles.cardSectionTitle}
+            color={highContrast ? '#FFFFFF' : '#0F172A'}
           >
-            OPTION A: PASTE OR TYPE THE MESSAGE
-          </Text>
+            Option A: Paste or type the message
+          </Heading>
 
           <TextInput
             multiline
@@ -146,7 +141,7 @@ export const ScamCheckScreen: React.FC = () => {
           />
 
           {/* Quick preset chips */}
-          <Text style={styles.presetsLabel}>OR TRY A COMMON PRACTICE SAMPLE:</Text>
+          <Text style={styles.presetsLabel}>Or try a common practice sample:</Text>
           <View style={styles.presetButtonsWrap}>
             {presets.map((p, idx) => (
               <Pressable
@@ -170,14 +165,13 @@ export const ScamCheckScreen: React.FC = () => {
             },
           ]}
         >
-          <Text
-            style={[
-              styles.cardSectionTitle,
-              { color: highContrast ? '#FFFFFF' : '#0F172A' },
-            ]}
+          <Heading
+            level={2}
+            style={styles.cardSectionTitle}
+            color={highContrast ? '#FFFFFF' : '#0F172A'}
           >
-            OPTION B: UPLOAD A PICTURE OR SCREENSHOT
-          </Text>
+            Option B: Upload a picture or screenshot
+          </Heading>
 
           <View style={styles.fileUploadArea}>
             <input
@@ -231,21 +225,21 @@ export const ScamCheckScreen: React.FC = () => {
             </View>
           ) : (
             <BigButton
-              label="🔍 CHECK THIS MESSAGE NOW"
+              label="Check this message now"
               variant="primary"
               disabled={!inputText.trim() && !imagePreview}
               onPress={handleCheck}
-              minHeight={58}
+              minHeight={64}
             />
           )}
 
           <Text
             style={[
               styles.privacyDisclaimer,
-              { color: highContrast ? '#CBD5E1' : '#64748B' },
+              { color: highContrast ? '#CBD5E1' : '#475569' },
             ]}
           >
-            🔒 We never store your passwords, bank cards, or personal secrets.
+            We never store your passwords, bank cards, or personal secrets.
           </Text>
         </View>
       </ScrollView>
@@ -265,8 +259,9 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   screenTitle: {
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: '800',
+    lineHeight: 37,
     marginBottom: 6,
     letterSpacing: -0.3,
   },
@@ -285,9 +280,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardSectionTitle: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    letterSpacing: 0.2,
     marginBottom: 12,
   },
   textArea: {
@@ -300,9 +295,9 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   presetsLabel: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#475569',
     marginBottom: 8,
   },
   presetButtonsWrap: {
@@ -318,7 +313,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   presetChipText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: '#334155',
   },
@@ -342,14 +337,14 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 10,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#1E40AF',
     textAlign: 'center',
   },
   privacyDisclaimer: {
     textAlign: 'center',
-    fontSize: 14,
+    fontSize: 18,
     marginTop: 12,
   },
 });

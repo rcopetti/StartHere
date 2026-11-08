@@ -5,31 +5,33 @@
  */
 
 import React from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useNavigate } from 'react-router-dom';
+import { Check, UserPlus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { ROUTES } from '../navigation/routes';
 
 export const HomeScreen: React.FC = () => {
   const { user, allLessons, trustedContacts, fontSize, highContrast } = useApp();
+  const { width } = useWindowDimensions();
   const navigate = useNavigate();
+  const isNarrow = width < 300;
 
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const firstName = user?.displayName?.trim().split(/\s+/)[0];
   const headline = firstName ? `You have support, ${firstName}.` : 'You have support.';
 
@@ -43,12 +45,9 @@ export const HomeScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.intro}>
-          <Text style={[styles.eyebrow, { color: highContrast ? '#CBD5E1' : '#52605F' }]}>
-            {greeting.toUpperCase()}
-          </Text>
-          <Text style={[styles.headline, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+          <Heading level={1} style={styles.headline} color={highContrast ? '#FFFFFF' : '#17212B'}>
             {headline}
-          </Text>
+          </Heading>
           <Text
             style={[
               styles.subtitle,
@@ -86,7 +85,7 @@ export const HomeScreen: React.FC = () => {
             ]}
           >
             <Text style={[styles.kicker, { color: highContrast ? '#CBD5E1' : '#795046' }]}>
-              LEARN SOMETHING NEW
+              Learn something new
             </Text>
             <Text style={[styles.sessionTitle, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
               {nextLesson.title}
@@ -123,11 +122,11 @@ export const HomeScreen: React.FC = () => {
             ]}
           >
             <Text style={[styles.kicker, { color: highContrast ? '#CBD5E1' : '#795046' }]}>
-              LEARN SOMETHING NEW
+              Learn something new
             </Text>
-            <Text style={[styles.sessionTitle, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+            <Heading level={2} style={styles.sessionTitle} color={highContrast ? '#FFFFFF' : '#17212B'}>
               Your sessions are getting ready.
-            </Text>
+            </Heading>
             <Text style={[styles.sessionGoal, { color: highContrast ? '#E2E8F0' : '#435159' }]}>
               You can still check a message whenever you need to.
             </Text>
@@ -140,14 +139,19 @@ export const HomeScreen: React.FC = () => {
           accessibilityLabel="Open Family Circle"
           style={({ pressed }: { pressed: boolean }) => [
             styles.familyCard,
+            isNarrow && styles.familyCardNarrow,
             {
               backgroundColor: highContrast ? '#123A27' : '#E4EEE6',
               opacity: pressed ? 0.85 : 1,
             },
           ]}
         >
-          <View style={styles.familyIcon}>
-            <Text style={styles.familyIconText}>✓</Text>
+          <View style={[styles.familyIcon, !contact && styles.familyIconAdd]}>
+            {contact ? (
+              <Check size={24} strokeWidth={2.6} color="#FFFFFF" aria-hidden="true" focusable="false" />
+            ) : (
+              <UserPlus size={24} strokeWidth={2.4} color="#FFFFFF" aria-hidden="true" focusable="false" />
+            )}
           </View>
           <View style={styles.familyText}>
             <Text style={[styles.familyTitle, { color: highContrast ? '#FFFFFF' : '#183E2A' }]}>
@@ -159,7 +163,9 @@ export const HomeScreen: React.FC = () => {
                 : 'Family Circle keeps a trusted person close.'}
             </Text>
           </View>
-          <Text style={[styles.chevron, { color: highContrast ? '#FFFFFF' : '#183E2A' }]}>›</Text>
+          {!isNarrow && (
+            <Text style={[styles.chevron, { color: highContrast ? '#FFFFFF' : '#183E2A' }]}>›</Text>
+          )}
         </Pressable>
 
         <View
@@ -171,9 +177,9 @@ export const HomeScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={[styles.tipLabel, { color: highContrast ? '#CBD5E1' : '#795046' }]}>
+          <Heading level={2} style={styles.tipLabel} color={highContrast ? '#CBD5E1' : '#795046'}>
             A small tip for today
-          </Text>
+          </Heading>
           <Text
             style={[
               styles.tipText,
@@ -204,16 +210,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 18,
   },
-  eyebrow: {
-    fontSize: 15,
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    marginBottom: 6,
-  },
   headline: {
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: '800',
-    lineHeight: 35,
+    lineHeight: 37,
     marginBottom: 8,
     letterSpacing: -0.3,
   },
@@ -232,15 +232,15 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   kicker: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.2,
     marginBottom: 5,
   },
   sessionTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '800',
-    lineHeight: 26,
+    lineHeight: 29,
     marginBottom: 5,
   },
   sessionGoal: {
@@ -253,11 +253,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   meta: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '700',
   },
   link: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
   },
   familyCard: {
@@ -269,30 +269,32 @@ const styles = StyleSheet.create({
     padding: 14,
     marginTop: 16,
   },
+  familyCardNarrow: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
   familyIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#1E5E3A',
   },
-  familyIconText: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: '800',
+  familyIconAdd: {
+    backgroundColor: '#18334D',
   },
   familyText: {
     flex: 1,
   },
   familyTitle: {
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: '800',
     marginBottom: 2,
   },
   familySubtitle: {
-    fontSize: 16,
-    lineHeight: 21,
+    fontSize: 18,
+    lineHeight: 24,
   },
   chevron: {
     fontSize: 30,
@@ -305,7 +307,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   tipLabel: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
     marginBottom: 4,
   },
