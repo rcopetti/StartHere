@@ -3,7 +3,7 @@
  * Allows easy customization of text size, high contrast mode, and automatic family alerting.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, Switch, StyleSheet } from 'react-native';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
@@ -21,10 +21,10 @@ export const SettingsScreen: React.FC = () => {
     highContrast,
     setHighContrast,
     toggleAutoAlert,
-    role,
-    setRole,
+    signOutUser,
   } = useApp();
   const navigate = useNavigate();
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   const fontOptions: Array<{ id: FontSizePreference; label: string }> = [
     { id: 'standard', label: 'Standard Text (20px)' },
@@ -37,7 +37,7 @@ export const SettingsScreen: React.FC = () => {
       <AppHeader
         title="Settings"
         showBack
-        onBack={() => navigate(role === 'family' ? ROUTES.familyPortal : ROUTES.home)}
+        onBack={() => navigate(ROUTES.home)}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -153,7 +153,7 @@ export const SettingsScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Switch Role */}
+        {/* Account */}
         <View
           style={[
             styles.card,
@@ -164,18 +164,41 @@ export const SettingsScreen: React.FC = () => {
           ]}
         >
           <Heading level={2} style={styles.cardTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
-            Active view or role
+            Your account
           </Heading>
           <Text style={styles.cardSubtitle}>
-            Currently viewing as: <Text style={{ fontWeight: '700' }}>{role === 'family' ? 'Family Member / Carer' : 'Senior User (Eleanor)'}</Text>
+            Signed in as <Text style={{ fontWeight: '700' }}>{user?.displayName || 'Friend'}</Text>
+            {user?.email ? ` (${user.email})` : ''}
           </Text>
 
-          <BigButton
-            label={role === 'family' ? 'SWITCH TO SENIOR PHONE VIEW' : 'SWITCH TO FAMILY COMPANION PORTAL'}
-            variant="outline"
-            onPress={() => setRole(role === 'family' ? 'senior' : 'family')}
-            minHeight={50}
-          />
+          {!confirmSignOut ? (
+            <BigButton
+              label="SIGN OUT"
+              variant="outline"
+              onPress={() => setConfirmSignOut(true)}
+              minHeight={56}
+            />
+          ) : (
+            <View>
+              <Text style={styles.cardSubtitle}>
+                Sign out of StartHere? Your lessons and checks stay saved.
+              </Text>
+              <BigButton
+                label="YES, SIGN OUT"
+                variant="danger"
+                onPress={() => {
+                  void signOutUser();
+                }}
+                minHeight={56}
+              />
+              <BigButton
+                label="NO, STAY SIGNED IN"
+                variant="outline"
+                onPress={() => setConfirmSignOut(false)}
+                minHeight={56}
+              />
+            </View>
+          )}
         </View>
 
         {/* About & Security */}

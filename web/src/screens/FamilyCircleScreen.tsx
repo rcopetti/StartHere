@@ -15,7 +15,7 @@ import { ROUTES } from '../navigation/routes';
 export const FamilyCircleScreen: React.FC = () => {
   const { trustedContacts, triggerEmergencyHelp, inviteFamilyMember, fontSize, highContrast } = useApp();
   const navigate = useNavigate();
-  const [helpSent, setHelpSent] = useState(false);
+  const [helpMessage, setHelpMessage] = useState<string | null>(null);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteName, setInviteName] = useState('');
   const [inviteRelationship, setInviteRelationship] = useState('');
@@ -35,9 +35,14 @@ export const FamilyCircleScreen: React.FC = () => {
   };
 
   const handlePanicAlert = async () => {
+    if (trustedContacts.length === 0) {
+      setHelpMessage("You don't have anyone in your circle yet. Add a family member first.");
+      return;
+    }
+
     await triggerEmergencyHelp();
-    setHelpSent(true);
-    setTimeout(() => setHelpSent(false), 5000);
+    setHelpMessage('Your help alert was sent to the people in your circle.');
+    setTimeout(() => setHelpMessage(null), 5000);
   };
 
   const handleCreateInvite = async () => {
@@ -72,11 +77,9 @@ export const FamilyCircleScreen: React.FC = () => {
           />
         </View>
 
-        {helpSent && (
+        {helpMessage && (
           <View style={styles.alertSentConfirmation}>
-            <Text style={styles.alertSentText}>
-              🚨 Help alert sent! Sarah and Tom received your message.
-            </Text>
+            <Text style={styles.alertSentText}>{helpMessage}</Text>
           </View>
         )}
 
@@ -84,6 +87,30 @@ export const FamilyCircleScreen: React.FC = () => {
         <Heading level={2} style={styles.sectionHeading} color={highContrast ? '#FFFFFF' : '#0F172A'}>
           Your trusted contacts ({trustedContacts.length})
         </Heading>
+
+        {trustedContacts.length === 0 && (
+          <View
+            style={[
+              styles.emptyCard,
+              {
+                backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
+                borderColor: highContrast ? '#FFFFFF' : '#E2E8F0',
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.emptyText,
+                {
+                  fontSize: getBodySize() - 1,
+                  color: highContrast ? '#E2E8F0' : '#475569',
+                },
+              ]}
+            >
+              No one added yet. Tap Add a new contact to invite someone you trust.
+            </Text>
+          </View>
+        )}
 
         {trustedContacts.map((contact) => (
           <View
@@ -364,5 +391,14 @@ const styles = StyleSheet.create({
   tokenHint: {
     fontSize: 16,
     color: '#047857',
+  },
+  emptyCard: {
+    borderWidth: 1,
+    borderRadius: 18,
+    padding: 18,
+    marginBottom: 16,
+  },
+  emptyText: {
+    lineHeight: 28,
   },
 });

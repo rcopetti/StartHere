@@ -1,6 +1,7 @@
 export type AppTab = 'home' | 'check' | 'coach';
 
 export const ROUTES = {
+  signIn: '/sign-in',
   onboarding: '/onboarding',
   home: '/home',
   check: '/check',
@@ -9,7 +10,6 @@ export const ROUTES = {
   coachLesson: (lessonId: string) => `/coach/${encodeURIComponent(lessonId)}`,
   coachComplete: (lessonId: string) => `/coach/${encodeURIComponent(lessonId)}/complete`,
   family: '/family',
-  familyPortal: '/family-portal',
   settings: '/settings',
 } as const;
 
@@ -30,6 +30,7 @@ export function lessonIdFromPath(pathname: string): string | null {
 }
 
 export function parentRouteForPath(pathname: string): string {
+  if (pathname === ROUTES.signIn) return ROUTES.signIn;
   if (pathname.startsWith('/check')) return ROUTES.check;
   if (pathname.startsWith('/coach')) return ROUTES.coach;
   if (pathname === ROUTES.family || pathname === ROUTES.settings) return ROUTES.home;

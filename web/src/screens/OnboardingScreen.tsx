@@ -1,9 +1,10 @@
 /**
  * Screen 1: Welcome & Onboarding
- * Allows immediate text size selection with live sample preview, then role selection.
+ * One job: choose a comfortable text size. Finishing saves the profile so the
+ * app can let the senior in, and shows who is signed in.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useNavigate } from 'react-router-dom';
 import { HeartHandshake } from 'lucide-react';
@@ -14,8 +15,10 @@ import { ROUTES } from '../navigation/routes';
 import type { FontSizePreference } from '../types';
 
 export const OnboardingScreen: React.FC = () => {
-  const { fontSize, setFontSize, role, setRole, highContrast } = useApp();
+  const { user, fontSize, setFontSize, highContrast, completeOnboarding, signOutUser } = useApp();
   const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getBodySize = () => {
     switch (fontSize) {
@@ -26,6 +29,33 @@ export const OnboardingScreen: React.FC = () => {
       case 'large':
       default:
         return 22;
+    }
+  };
+
+  const handleGetStarted = async () => {
+    if (!user || saving) return;
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      await completeOnboarding({
+        displayName: user.displayName?.trim() || 'Friend',
+        fontSizePreference: fontSize,
+        highContrast,
+        autoAlertOnScam: true,
+      });
+      navigate(ROUTES.home, { replace: true });
+    } catch (err) {
+      console.error('Unable to save onboarding choices:', err);
+      const code = (err as { code?: string }).code;
+      setError(
+        code === 'permission-denied'
+          ? "I couldn't save your choices because this account isn't allowed to save yet. Please ask Mark for help."
+          : "I couldn't save your choices just now. Please tap Get Started again."
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -61,7 +91,6 @@ export const OnboardingScreen: React.FC = () => {
         </Text>
       </View>
 
-      {/* Text Size Customization */}
       <View
         style={[
           styles.card,
@@ -140,61 +169,43 @@ export const OnboardingScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Role Selection */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
-            borderColor: highContrast ? '#FFFFFF' : '#E2E8F0',
-          },
-        ]}
-      >
-        <Heading level={2} style={styles.sectionHeading} color={highContrast ? '#FFFFFF' : '#1E293B'}>
-          Who is using this phone?
-        </Heading>
+      {error && (
+        <View role="alert" style={styles.errorBox}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
 
-        <Pressable
-          onPress={() => setRole('senior')}
-          style={[
-            styles.roleCard,
-            {
-              borderColor: role === 'senior' ? '#2563EB' : '#CBD5E1',
-              backgroundColor: role === 'senior' ? (highContrast ? '#334155' : '#EFF6FF') : 'transparent',
-            },
-          ]}
-        >
-          <Text style={styles.roleTitle}>I am a senior</Text>
-          <Text style={styles.roleDescription}>
-            I want help with my phone and protection from scam messages.
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => setRole('family')}
-          style={[
-            styles.roleCard,
-            {
-              borderColor: role === 'family' ? '#2563EB' : '#CBD5E1',
-              backgroundColor: role === 'family' ? (highContrast ? '#334155' : '#EFF6FF') : 'transparent',
-            },
-          ]}
-        >
-          <Text style={styles.roleTitle}>I am a family member or carer</Text>
-          <Text style={styles.roleDescription}>
-            I want to link to a loved one's phone and receive instant scam alerts.
-          </Text>
-        </Pressable>
-      </View>
-
-      {/* Get Started Button */}
       <View style={styles.actionContainer}>
         <BigButton
-          label="GET STARTED  ➔"
+          label={saving ? 'SAVING YOUR CHOICES…' : 'GET STARTED  ➔'}
           variant="primary"
-          onPress={() => navigate(role === 'family' ? ROUTES.familyPortal : ROUTES.home)}
+          onPress={() => {
+            void handleGetStarted();
+          }}
+          disabled={saving}
           minHeight={58}
         />
+      </View>
+
+      <View style={styles.accountRow}>
+        <Text style={[styles.accountText, { color: highContrast ? '#CBD5E1' : '#475569' }]}>
+          Signed in as {user?.displayName || 'your Google account'}
+        </Text>
+        <Pressable
+          onPress={() => {
+            void signOutUser();
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Sign out and use a different account"
+          style={({ pressed }: { pressed: boolean }) => [
+            styles.accountLink,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
+        >
+          <Text style={[styles.accountLinkText, { color: highContrast ? '#FFFFFF' : '#1E5E3A' }]}>
+            Not you? Sign out
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -301,24 +312,38 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     lineHeight: 26,
   },
-  roleCard: {
-    padding: 16,
-    borderRadius: 16,
+  errorBox: {
+    backgroundColor: '#FFFBEB',
+    borderColor: '#B45309',
     borderWidth: 2,
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 12,
   },
-  roleTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#0F172A',
-    marginBottom: 4,
-  },
-  roleDescription: {
-    fontSize: 18,
-    color: '#475569',
-    lineHeight: 22,
+  errorText: {
+    color: '#78350F',
+    fontSize: 19,
+    lineHeight: 26,
+    fontWeight: '600',
   },
   actionContainer: {
     marginTop: 8,
+  },
+  accountRow: {
+    alignItems: 'center',
+    marginTop: 18,
+    gap: 4,
+  },
+  accountText: {
+    fontSize: 18,
+  },
+  accountLink: {
+    minHeight: 48,
+    justifyContent: 'center',
+  },
+  accountLinkText: {
+    fontSize: 19,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
 });

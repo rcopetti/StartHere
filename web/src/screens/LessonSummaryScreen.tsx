@@ -35,7 +35,7 @@ export const LessonSummaryScreen: React.FC = () => {
 
   const total = scenarioAnswers.length || 5;
   const correctCount = scenarioAnswers.filter((a) => a.isCorrect).length;
-  const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'Eleanor';
+  const firstName = user?.displayName ? user.displayName.split(' ')[0] : 'Friend';
 
   return (
     <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>

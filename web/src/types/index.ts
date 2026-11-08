@@ -11,11 +11,14 @@ export interface UserProfile {
   uid: string;
   role: UserRole;
   displayName: string;
+  email?: string;
   phone?: string;
+  onboarded: boolean;
   fontSizePreference: FontSizePreference;
   highContrast: boolean;
   autoAlertOnScam: boolean;
   createdAt: number;
+  updatedAt?: number;
 }
 
 export interface TrustedContact {
