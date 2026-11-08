@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { UserRole, FontSizePreference } from '../types';
+import { UserRole, FontSizePreference } from '../dashboardTypes';
 import { Shield, Heart, Check, Bell, ArrowRight, Sun } from 'lucide-react';
 
 export const OnboardingScreen: React.FC = () => {

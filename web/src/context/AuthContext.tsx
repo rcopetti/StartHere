@@ -13,7 +13,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { auth, db, googleProvider, handleFirestoreError, OperationType } from '../firebase';
-import { UserProfile, UserRole, FontSizePreference } from '../types';
+import { UserProfile, UserRole, FontSizePreference } from '../dashboardTypes';
 
 interface AuthContextType {
   user: User | null;

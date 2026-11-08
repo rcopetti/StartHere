@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ShieldCheck, Heart, LogOut, Type, Sun } from 'lucide-react';
-import { FontSizePreference } from '../types';
+import { FontSizePreference } from '../dashboardTypes';
 
 export const Navbar: React.FC = () => {
   const { profile, signOutUser, updatePreferences } = useAuth();
