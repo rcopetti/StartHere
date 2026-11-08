@@ -16,7 +16,13 @@ import type {
   UserRole,
 } from '../types';
 import {
-  initAuthAndProfile,
+  observeAuth,
+  completeGoogleRedirectSignIn,
+  signInWithGoogle as signInWithGoogleService,
+  signOutUser as signOutUserService,
+  ensureUserProfile,
+  subscribeToProfile,
+  saveUserProfile,
   updateUserProfile,
   subscribeToAlerts,
   subscribeToTrustedContacts,
@@ -28,10 +34,13 @@ import {
   saveScamCheckRecord,
 } from '../services/firebase';
 import { analyzeScamCheck } from '../services/gemini';
+import { resolveAuthStage, type AuthStage } from '../auth/authState';
 
 interface AppContextType {
   user: UserProfile | null;
   loading: boolean;
+  authStage: AuthStage;
+  authError: string | null;
   allLessons: LessonDocument[];
   activeLesson: LessonDocument | null;
   activeStepIndex: number;
@@ -46,6 +55,16 @@ interface AppContextType {
   role: UserRole;
   isScenarioAnswered: boolean;
   // Actions
+  signInWithGoogle: () => Promise<void>;
+  signOutUser: () => Promise<void>;
+  completeOnboarding: (preferences: {
+    displayName: string;
+    email?: string;
+    phone?: string;
+    fontSizePreference: FontSizePreference;
+    highContrast: boolean;
+    autoAlertOnScam: boolean;
+  }) => Promise<void>;
   setFontSize: (size: FontSizePreference) => void;
   setHighContrast: (enabled: boolean) => void;
   setRole: (role: UserRole) => void;
@@ -62,9 +81,24 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null);
 
+function signInErrorMessage(code?: string): string {
+  switch (code) {
+    case 'auth/popup-closed-by-user':
+      return 'The sign-in window closed before you finished. Nothing was shared. Tap the button to try again.';
+    case 'auth/popup-blocked':
+      return 'Your browser stopped the sign-in window. Tap the green button again.';
+    case 'auth/unauthorized-domain':
+    case 'auth/operation-not-allowed':
+      return "Sign-in isn't set up on this address yet. Please ask Mark for help.";
+    default:
+      return "We couldn't sign you in just now. Nothing was shared. Please try again.";
+  }
+}
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [authStage, setAuthStage] = useState<AuthStage>('loading');
+  const [authError, setAuthError] = useState<string | null>(null);
   const [allLessons, setAllLessons] = useState<LessonDocument[]>([]);
   const [activeLesson, setActiveLesson] = useState<LessonDocument | null>(null);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
@@ -80,41 +114,132 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const highContrast = user?.highContrast || false;
   const role = user?.role || 'senior';
 
+  const loading = authStage === 'loading';
+
   // Initialize Auth, Profile, and Lessons
   useEffect(() => {
-    let unsubscribeAlerts: () => void = () => {};
-    let unsubscribeContacts: () => void = () => {};
+    let cancelled = false;
 
-    async function bootstrap() {
-      try {
-        const { profile } = await initAuthAndProfile();
-        setUser(profile);
+    void completeGoogleRedirectSignIn();
 
-        const lessons = await seedLessonsIfEmpty();
-        setAllLessons(lessons);
+    const unsubscribeAuth = observeAuth(async (fbUser) => {
+      if (cancelled) return;
 
-        // Subscriptions
-        unsubscribeAlerts = subscribeToAlerts((incomingAlerts) => {
-          setAlerts(incomingAlerts);
-        });
-
-        unsubscribeContacts = subscribeToTrustedContacts(profile.uid, (contacts) => {
-          setTrustedContacts(contacts);
-        });
-      } catch (err) {
-        console.error('Initialization error:', err);
-      } finally {
-        setLoading(false);
+      if (!fbUser) {
+        setUser(null);
+        setAuthError(null);
+        setAuthStage('signed_out');
+        return;
       }
-    }
 
-    bootstrap();
+      setAuthStage('loading');
+      setAuthError(null);
+
+      try {
+        const profile = await ensureUserProfile(fbUser);
+        if (cancelled) return;
+        setUser(profile);
+        setAuthStage(resolveAuthStage({
+          authReady: true,
+          hasFirebaseUser: true,
+          profileLoaded: true,
+          onboarded: profile.onboarded,
+        }));
+      } catch (err) {
+        if (cancelled) return;
+        console.error('Unable to load the user profile:', err);
+        setUser(null);
+        setAuthError("You're signed in, but StartHere could not open your profile. Please try again in a moment.");
+        setAuthStage('signed_out');
+      }
+    });
 
     return () => {
+      cancelled = true;
+      unsubscribeAuth();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (authStage !== 'ready' || !user?.uid) {
+      setAlerts([]);
+      setTrustedContacts([]);
+      return;
+    }
+
+    let active = true;
+    const uid = user.uid;
+
+    const unsubscribeProfile = subscribeToProfile(uid, (profile) => {
+      if (active && profile) setUser(profile);
+    });
+
+    const unsubscribeAlerts = subscribeToAlerts(uid, (incomingAlerts) => {
+      if (active) setAlerts(incomingAlerts);
+    });
+
+    const unsubscribeContacts = subscribeToTrustedContacts(uid, (contacts) => {
+      if (active) setTrustedContacts(contacts);
+    });
+
+    seedLessonsIfEmpty()
+      .then((lessons) => {
+        if (active) setAllLessons(lessons);
+      })
+      .catch((err) => console.warn('Unable to load lessons:', err));
+
+    return () => {
+      active = false;
+      unsubscribeProfile();
       unsubscribeAlerts();
       unsubscribeContacts();
     };
-  }, []);
+  }, [authStage, user?.uid]);
+
+  const signInWithGoogle = async () => {
+    setAuthError(null);
+    try {
+      await signInWithGoogleService();
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code === 'auth/cancelled-popup-request') return;
+      console.warn('Google sign-in did not complete:', code);
+      setAuthError(signInErrorMessage(code));
+    }
+  };
+
+  const signOutUser = async () => {
+    await signOutUserService();
+    setUser(null);
+    setAlerts([]);
+    setTrustedContacts([]);
+    setActiveScamResult(null);
+    setAuthError(null);
+    setAuthStage('signed_out');
+  };
+
+  const completeOnboarding = async (preferences: {
+    displayName: string;
+    email?: string;
+    phone?: string;
+    fontSizePreference: FontSizePreference;
+    highContrast: boolean;
+    autoAlertOnScam: boolean;
+  }) => {
+    if (!user) throw new Error('You must be signed in to finish setup.');
+
+    const next: UserProfile = {
+      ...user,
+      ...preferences,
+      role: 'senior',
+      onboarded: true,
+      updatedAt: Date.now(),
+    };
+
+    await saveUserProfile(next);
+    setUser(next);
+    setAuthStage('ready');
+  };
 
   const setFontSize = (size: FontSizePreference) => {
     if (!user) return;
@@ -259,6 +384,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         user,
         loading,
+        authStage,
+        authError,
         allLessons,
         activeLesson,
         activeStepIndex,
@@ -272,6 +399,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         highContrast,
         role,
         isScenarioAnswered,
+        signInWithGoogle,
+        signOutUser,
+        completeOnboarding,
         setFontSize,
         setHighContrast,
         setRole,

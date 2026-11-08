@@ -12,13 +12,26 @@ import {
   getDocs,
   collection,
   query,
+  where,
   orderBy,
   onSnapshot,
   updateDoc,
   getDocFromServer,
   Firestore,
 } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged, Auth, User } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  setPersistence,
+  browserLocalPersistence,
+  Auth,
+  User,
+} from 'firebase/auth';
 import type {
   UserProfile,
   TrustedContact,
@@ -62,100 +75,99 @@ export async function testFirestoreConnection(): Promise<boolean> {
   }
 }
 
-/**
- * Initializes anonymous user session and retrieves or provisions initial user profile
- */
-export async function initAuthAndProfile(): Promise<{ user: User; profile: UserProfile }> {
-  return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (currentUser) => {
-      try {
-        let activeUser = currentUser;
-        if (!activeUser) {
-          const cred = await signInAnonymously(auth);
-          activeUser = cred.user;
-        }
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-        const userDocRef = doc(db, 'users', activeUser.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        let profile: UserProfile;
-        if (userDoc.exists()) {
-          profile = userDoc.data() as UserProfile;
-        } else {
-          profile = {
-            uid: activeUser.uid,
-            role: 'senior',
-            displayName: 'Eleanor Miller',
-            phone: '(555) 345-6789',
-            onboarded: true,
-            fontSizePreference: 'large',
-            highContrast: false,
-            autoAlertOnScam: true,
-            createdAt: Date.now(),
-          };
-          await setDoc(userDocRef, profile);
-
-          // Seed default sample trusted contacts for Eleanor
-          await seedDefaultContacts(activeUser.uid);
-        }
-
-        // Test connection in background
-        testFirestoreConnection();
-
-        resolve({ user: activeUser, profile });
-      } catch (err) {
-        console.error('Failed to initialize auth and profile:', err);
-        // Fallback dummy profile for immediate offline resilience
-        const fallbackProfile: UserProfile = {
-          uid: 'senior-local-user',
-          role: 'senior',
-          displayName: 'Eleanor Miller',
-          phone: '(555) 345-6789',
-          onboarded: true,
-          fontSizePreference: 'large',
-          highContrast: false,
-          autoAlertOnScam: true,
-          createdAt: Date.now(),
-        };
-        resolve({
-          user: { uid: 'senior-local-user' } as User,
-          profile: fallbackProfile,
-        });
-      }
-    });
-  });
+export function observeAuth(callback: (user: User | null) => void) {
+  return onAuthStateChanged(auth, callback);
 }
 
-/**
- * Seeds sample family contacts for demo experience
- */
-async function seedDefaultContacts(seniorUid: string) {
+export async function completeGoogleRedirectSignIn(): Promise<void> {
   try {
-    const contactSarah: TrustedContact = {
-      id: 'contact-sarah',
-      seniorUid,
-      name: 'Sarah Miller',
-      relationship: 'Daughter',
-      phone: '(555) 234-5678',
-      status: 'active',
-      linkedUid: 'family-member-sarah',
-      linkedAt: Date.now() - 86400000,
-    };
-    const contactTom: TrustedContact = {
-      id: 'contact-tom',
-      seniorUid,
-      name: 'Tom Miller',
-      relationship: 'Son',
-      phone: '(555) 876-5432',
-      status: 'active',
-      linkedUid: 'family-member-tom',
-      linkedAt: Date.now() - 43200000,
-    };
-    await setDoc(doc(db, 'users', seniorUid, 'trustedContacts', contactSarah.id), contactSarah);
-    await setDoc(doc(db, 'users', seniorUid, 'trustedContacts', contactTom.id), contactTom);
-  } catch (err) {
-    console.warn('Unable to seed default contacts:', err);
+    await getRedirectResult(auth);
+  } catch {
+    // The auth listener surfaces the failure; nothing else to do here.
   }
+}
+
+export async function signInWithGoogle(): Promise<void> {
+  await setPersistence(auth, browserLocalPersistence);
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (err) {
+    const code = (err as { code?: string }).code;
+    if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+      await signInWithRedirect(auth, googleProvider);
+      return;
+    }
+    throw err;
+  }
+}
+
+export async function signOutUser(): Promise<void> {
+  await signOut(auth);
+}
+
+function defaultProfile(fbUser: User): UserProfile {
+  return {
+    uid: fbUser.uid,
+    role: 'senior',
+    displayName: fbUser.displayName?.trim() || 'Friend',
+    email: fbUser.email ?? undefined,
+    onboarded: false,
+    fontSizePreference: 'large',
+    highContrast: false,
+    autoAlertOnScam: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+}
+
+export async function ensureUserProfile(fbUser: User): Promise<UserProfile> {
+  const ref = doc(db, 'users', fbUser.uid);
+  const snapshot = await getDoc(ref);
+
+  if (snapshot.exists()) {
+    const existing = snapshot.data() as Partial<UserProfile>;
+    if (typeof existing.onboarded === 'boolean') {
+      return existing as UserProfile;
+    }
+
+    const normalized: UserProfile = {
+      ...defaultProfile(fbUser),
+      ...existing,
+      uid: fbUser.uid,
+      createdAt: existing.createdAt ?? Date.now(),
+      onboarded: false,
+      updatedAt: Date.now(),
+    };
+    await setDoc(ref, normalized);
+    return normalized;
+  }
+
+  const profile = defaultProfile(fbUser);
+  await setDoc(ref, profile);
+  return profile;
+}
+
+export function subscribeToProfile(
+  uid: string,
+  callback: (profile: UserProfile | null) => void
+) {
+  return onSnapshot(
+    doc(db, 'users', uid),
+    (snapshot) => callback(snapshot.exists() ? (snapshot.data() as UserProfile) : null),
+    (err) => {
+      console.warn('Profile snapshot listener error:', err);
+    }
+  );
+}
+
+export async function saveUserProfile(profile: UserProfile): Promise<void> {
+  await setDoc(doc(db, 'users', profile.uid), {
+    ...profile,
+    updatedAt: Date.now(),
+  });
 }
 
 /**
@@ -193,9 +205,13 @@ export async function updateUserProfile(uid: string, updates: Partial<UserProfil
 /**
  * Subscribes to live alerts
  */
-export function subscribeToAlerts(callback: (alerts: AlertItem[]) => void) {
+export function subscribeToAlerts(seniorUid: string, callback: (alerts: AlertItem[]) => void) {
   try {
-    const q = query(collection(db, 'alerts'), orderBy('sentAt', 'desc'));
+    const q = query(
+      collection(db, 'alerts'),
+      where('seniorUid', '==', seniorUid),
+      orderBy('sentAt', 'desc')
+    );
     return onSnapshot(q, (snapshot) => {
       const items: AlertItem[] = [];
       snapshot.forEach((d) => items.push(d.data() as AlertItem));
@@ -288,10 +304,9 @@ export async function generateInviteToken(
   phone: string
 ): Promise<TrustedContact> {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnopqrstuvwxyz';
-  let token = '';
-  for (let i = 0; i < 32; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
+  const randomValues = new Uint32Array(32);
+  crypto.getRandomValues(randomValues);
+  const token = Array.from(randomValues, (value) => chars.charAt(value % chars.length)).join('');
 
   const contactId = `contact-${Date.now()}`;
   const newContact: TrustedContact = {
