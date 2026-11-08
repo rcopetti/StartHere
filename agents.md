@@ -400,3 +400,16 @@ functions/                        # Backend Cloud Functions (Node.js/TypeScript)
    - **Screenshot Lifecycle**: Keep alerts and scam check workflows direct without introducing Cloud Storage purge daemons or signed URL minting complexity in MVP.
 5. **Preserve Two-Way Reassurance**: Any alert sent to family must provide a way for family to acknowledge (`ackAt`) so the senior's screen can show *"Mark is handling this"*.
 6. **Always Verify Accessibility**: Run linter and compiler checks after every change. Ensure no nested elements clip text when font sizes scale up to 200%.
+
+---
+
+## 8. Local Development Commands
+
+- **Node.js**: Use `nvm use 24.12.0`; the resolved Firebase packages require Node.js 24.12 or newer.
+- **Install**: `npm install --legacy-peer-deps` (the declared `vite`/`esbuild` peer range conflicts with the current manifest).
+- **Run**: `npm run dev` → `http://localhost:3000/`.
+- **Type check**: `npm run lint`.
+- **Build**: `npm run build`.
+- **Route tests**: `node --import tsx --test web/src/navigation/routes.test.ts`.
+- **Gemini fallback test**: `node --import tsx --test web/src/services/gemini.test.ts`.
+
