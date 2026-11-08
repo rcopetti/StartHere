@@ -41,6 +41,7 @@ import type {
   ScamCheckResult,
 } from '../types';
 import lessonsData from '../../../foundation/starthere-dev-handoff/lessons.json';
+import { withoutUndefined } from './firestoreValues';
 
 // Configuration injected by ProvisionFirebase
 const firebaseConfig = {
@@ -109,7 +110,7 @@ export async function signOutUser(): Promise<void> {
 }
 
 function defaultProfile(fbUser: User): UserProfile {
-  return {
+  const profile: UserProfile = {
     uid: fbUser.uid,
     role: 'senior',
     displayName: fbUser.displayName?.trim() || 'Friend',
@@ -121,6 +122,7 @@ function defaultProfile(fbUser: User): UserProfile {
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
+  return withoutUndefined(profile);
 }
 
 export async function ensureUserProfile(fbUser: User): Promise<UserProfile> {
@@ -141,12 +143,12 @@ export async function ensureUserProfile(fbUser: User): Promise<UserProfile> {
       onboarded: false,
       updatedAt: Date.now(),
     };
-    await setDoc(ref, normalized);
+    await setDoc(ref, withoutUndefined(normalized));
     return normalized;
   }
 
   const profile = defaultProfile(fbUser);
-  await setDoc(ref, profile);
+  await setDoc(ref, withoutUndefined(profile));
   return profile;
 }
 
@@ -164,10 +166,10 @@ export function subscribeToProfile(
 }
 
 export async function saveUserProfile(profile: UserProfile): Promise<void> {
-  await setDoc(doc(db, 'users', profile.uid), {
+  await setDoc(doc(db, 'users', profile.uid), withoutUndefined({
     ...profile,
     updatedAt: Date.now(),
-  });
+  }));
 }
 
 /**
@@ -196,7 +198,7 @@ export async function seedLessonsIfEmpty(): Promise<LessonDocument[]> {
 export async function updateUserProfile(uid: string, updates: Partial<UserProfile>): Promise<void> {
   try {
     const ref = doc(db, 'users', uid);
-    await updateDoc(ref, updates);
+    await updateDoc(ref, withoutUndefined(updates));
   } catch (err) {
     console.warn('Failed to update user profile in Firestore:', err);
   }
@@ -271,7 +273,7 @@ export async function sendFamilyAlert(
   };
 
   try {
-    await setDoc(doc(db, 'alerts', alertId), alertItem);
+    await setDoc(doc(db, 'alerts', alertId), withoutUndefined(alertItem));
   } catch (err) {
     console.warn('Failed to record alert in Firestore:', err);
   }
@@ -333,7 +335,7 @@ export async function generateInviteToken(
  */
 export async function saveCoachSession(session: CoachSession): Promise<void> {
   try {
-    await setDoc(doc(db, 'users', session.seniorUid, 'sessions', session.id), session);
+    await setDoc(doc(db, 'users', session.seniorUid, 'sessions', session.id), withoutUndefined(session));
   } catch (err) {
     console.warn('Failed to save session in Firestore:', err);
   }
@@ -344,10 +346,10 @@ export async function saveCoachSession(session: CoachSession): Promise<void> {
  */
 export async function saveScamCheckRecord(record: ScamCheckResult, seniorUid: string): Promise<void> {
   try {
-    await setDoc(doc(db, 'scamChecks', record.id), {
+    await setDoc(doc(db, 'scamChecks', record.id), withoutUndefined({
       ...record,
       seniorUid,
-    });
+    }));
   } catch (err) {
     console.warn('Failed to save scam check in Firestore:', err);
   }

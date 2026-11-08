@@ -73,7 +73,7 @@ The Firestore database is named `ai-studio-starthereseniort-d5bbff61-0c13-49da-b
 
 ```bash
 npm run lint
-node --import tsx --test web/src/navigation/routes.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
+node --import tsx --test web/src/navigation/routes.test.ts web/src/auth/authState.test.ts web/src/services/firestoreValues.test.ts web/src/pwa.test.ts web/src/services/gemini.test.ts
 ```
 
 ### Install as a PWA

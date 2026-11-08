@@ -41,8 +41,6 @@ export const OnboardingScreen: React.FC = () => {
     try {
       await completeOnboarding({
         displayName: user.displayName?.trim() || 'Friend',
-        email: user.email,
-        phone: user.phone,
         fontSizePreference: fontSize,
         highContrast,
         autoAlertOnScam: true,
@@ -50,7 +48,12 @@ export const OnboardingScreen: React.FC = () => {
       navigate(ROUTES.home, { replace: true });
     } catch (err) {
       console.error('Unable to save onboarding choices:', err);
-      setError("I couldn't save your choices just now. Please tap Get Started again.");
+      const code = (err as { code?: string }).code;
+      setError(
+        code === 'permission-denied'
+          ? "I couldn't save your choices because this account isn't allowed to save yet. Please ask Mark for help."
+          : "I couldn't save your choices just now. Please tap Get Started again."
+      );
     } finally {
       setSaving(false);
     }
