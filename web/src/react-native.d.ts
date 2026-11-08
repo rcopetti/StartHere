@@ -17,7 +17,11 @@ declare module 'react-native' {
     disabled?: boolean;
     accessibilityRole?: string;
     accessibilityLabel?: string;
-    accessibilityState?: { selected?: boolean };
+    accessibilityState?: { selected?: boolean; checked?: boolean; pressed?: boolean; expanded?: boolean; disabled?: boolean };
+    role?: string;
+    'aria-checked'?: boolean;
+    'aria-pressed'?: boolean;
+    'aria-label'?: string;
     style?: any;
     children?: React.ReactNode | ((state: { pressed: boolean }) => React.ReactNode);
   }
@@ -25,14 +29,20 @@ declare module 'react-native' {
 
   export interface ViewProps {
     style?: any;
+    role?: string;
+    'aria-label'?: string;
+    'aria-modal'?: boolean;
     accessibilityRole?: string;
     accessibilityLabel?: string;
+    accessibilityViewIsModal?: boolean;
     children?: React.ReactNode;
   }
   export const View: React.FC<ViewProps>;
 
   export interface TextProps {
     style?: any;
+    role?: string;
+    'aria-level'?: number;
     numberOfLines?: number;
     selectable?: boolean;
     children?: React.ReactNode;
@@ -48,6 +58,7 @@ declare module 'react-native' {
 
   export interface TextInputProps {
     style?: any;
+    accessibilityLabel?: string;
     value?: string;
     onChangeText?: (text: string) => void;
     placeholder?: string;
@@ -62,6 +73,7 @@ declare module 'react-native' {
     value?: boolean;
     onValueChange?: (val: boolean) => void;
     trackColor?: { false?: string; true?: string };
+    accessibilityLabel?: string;
   }
   export const Switch: React.FC<SwitchProps>;
 
@@ -71,7 +83,25 @@ declare module 'react-native' {
   }
   export const ActivityIndicator: React.FC<ActivityIndicatorProps>;
 
+  export interface ModalProps {
+    visible?: boolean;
+    transparent?: boolean;
+    animationType?: 'none' | 'slide' | 'fade';
+    onRequestClose?: () => void;
+    children?: React.ReactNode;
+  }
+  export const Modal: React.FC<ModalProps>;
+
+  export interface WindowDimensions {
+    width: number;
+    height: number;
+    scale: number;
+    fontScale: number;
+  }
+  export function useWindowDimensions(): WindowDimensions;
+
   export const StyleSheet: {
     create<T extends Record<string, any>>(styles: T): T;
+    absoluteFill: any;
   };
 }

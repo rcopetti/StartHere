@@ -1,198 +1,197 @@
 /**
- * Screen 2: Senior Home Screen (Hub)
- * Emphasizes 3 primary action cards with generous touch spacing and warm color accents.
+ * Guided Home
+ * Reassures the senior, makes Check something the one primary action,
+ * and keeps a short practice session and trusted contact within reach.
  */
 
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { useNavigate } from 'react-router-dom';
+import { Check, UserPlus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
+import { ROUTES } from '../navigation/routes';
 
 export const HomeScreen: React.FC = () => {
-  const { user, setScreen, fontSize, highContrast, triggerEmergencyHelp, trustedContacts } = useApp();
-  const [helpSent, setHelpSent] = useState(false);
+  const { user, allLessons, trustedContacts, fontSize, highContrast } = useApp();
+  const { width } = useWindowDimensions();
+  const navigate = useNavigate();
+  const isNarrow = width < 300;
 
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
-  const handleEmergencyHelp = async () => {
-    await triggerEmergencyHelp();
-    setHelpSent(true);
-    setTimeout(() => setHelpSent(false), 5000);
-  };
+  const firstName = user?.displayName?.trim().split(/\s+/)[0];
+  const headline = firstName ? `You have support, ${firstName}.` : 'You have support.';
 
-  const contactNames = trustedContacts.length > 0
-    ? trustedContacts.map((c) => `${c.name} (${c.relationship})`).join(', ')
-    : 'Sarah (Daughter), Tom (Son)';
+  const nextLesson =
+    allLessons.find((lesson) => lesson.lessonId === 'fake-bank-text') ?? allLessons[0] ?? null;
+  const contact = trustedContacts[0] ?? null;
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
-      <AppHeader title="StartHere" showSettings />
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
+      <AppHeader title="StartHere" showPersonMenu />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Welcome Greeting */}
-        <View style={styles.greetingSection}>
+        <View style={styles.intro}>
+          <Heading level={1} style={styles.headline} color={highContrast ? '#FFFFFF' : '#17212B'}>
+            {headline}
+          </Heading>
           <Text
             style={[
-              styles.greetingTitle,
-              { color: highContrast ? '#FFFFFF' : '#0F172A' },
-            ]}
-          >
-            Good afternoon, {user?.displayName ? user.displayName.split(' ')[0] : 'Eleanor'}! ☀️
-          </Text>
-          <Text
-            style={[
-              styles.greetingSubtitle,
+              styles.subtitle,
               {
                 fontSize: getBodySize(),
-                color: highContrast ? '#CBD5E1' : '#475569',
+                color: highContrast ? '#CBD5E1' : '#435159',
+                lineHeight: getBodySize() * 1.35,
               },
             ]}
           >
-            What would you like to do today?
+            Start with what would help most right now.
           </Text>
         </View>
 
-        {/* Emergency Confirmation Banner if just pressed */}
-        {helpSent && (
-          <View style={styles.helpAlertBanner}>
-            <Text style={styles.helpAlertText}>
-              🚨 Help alert sent to your family circle! Sarah and Tom were notified.
+        <BigButton
+          label="Check something"
+          sublabel="Message, letter, link, or call"
+          variant="navy"
+          onPress={() => navigate(ROUTES.check)}
+          minHeight={68}
+        />
+
+        {nextLesson ? (
+          <Pressable
+            onPress={() => navigate(ROUTES.coach)}
+            accessibilityRole="button"
+            accessibilityLabel={`Open Coach. Next session: ${nextLesson.title}`}
+            style={({ pressed }: { pressed: boolean }) => [
+              styles.sessionCard,
+              {
+                backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
+                borderColor: highContrast ? '#FFFFFF' : '#E0E5E1',
+                opacity: pressed ? 0.85 : 1,
+              },
+            ]}
+          >
+            <Text style={[styles.kicker, { color: highContrast ? '#CBD5E1' : '#795046' }]}>
+              Learn something new
+            </Text>
+            <Text style={[styles.sessionTitle, { color: highContrast ? '#FFFFFF' : '#17212B' }]}>
+              {nextLesson.title}
+            </Text>
+            <Text
+              style={[
+                styles.sessionGoal,
+                {
+                  fontSize: getBodySize(),
+                  color: highContrast ? '#E2E8F0' : '#435159',
+                  lineHeight: (getBodySize() - 1) * 1.35,
+                },
+              ]}
+            >
+              {nextLesson.goal}
+            </Text>
+            <View style={styles.sessionMetaRow}>
+              <Text style={[styles.meta, { color: highContrast ? '#CBD5E1' : '#52605F' }]}>
+                {nextLesson.minutes} min · {nextLesson.steps.length} questions
+              </Text>
+              <Text style={[styles.link, { color: highContrast ? '#FFFFFF' : '#183E2A' }]}>
+                See all sessions ›
+              </Text>
+            </View>
+          </Pressable>
+        ) : (
+          <View
+            style={[
+              styles.sessionCard,
+              {
+                backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
+                borderColor: highContrast ? '#FFFFFF' : '#E0E5E1',
+              },
+            ]}
+          >
+            <Text style={[styles.kicker, { color: highContrast ? '#CBD5E1' : '#795046' }]}>
+              Learn something new
+            </Text>
+            <Heading level={2} style={styles.sessionTitle} color={highContrast ? '#FFFFFF' : '#17212B'}>
+              Your sessions are getting ready.
+            </Heading>
+            <Text style={[styles.sessionGoal, { color: highContrast ? '#E2E8F0' : '#435159' }]}>
+              You can still check a message whenever you need to.
             </Text>
           </View>
         )}
 
-        {/* Action Card 1: Learn Something New */}
-        <View
-          style={[
-            styles.card,
+        <Pressable
+          onPress={() => navigate(ROUTES.family)}
+          accessibilityRole="button"
+          accessibilityLabel="Open Family Circle"
+          style={({ pressed }: { pressed: boolean }) => [
+            styles.familyCard,
+            isNarrow && styles.familyCardNarrow,
             {
-              backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
-              borderColor: highContrast ? '#FFFFFF' : '#E2E8F0',
+              backgroundColor: highContrast ? '#123A27' : '#E4EEE6',
+              opacity: pressed ? 0.85 : 1,
             },
           ]}
         >
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>🎓</Text>
-            <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-              LEARN SOMETHING NEW
+          <View style={[styles.familyIcon, !contact && styles.familyIconAdd]}>
+            {contact ? (
+              <Check size={24} strokeWidth={2.6} color="#FFFFFF" aria-hidden="true" focusable="false" />
+            ) : (
+              <UserPlus size={24} strokeWidth={2.4} color="#FFFFFF" aria-hidden="true" focusable="false" />
+            )}
+          </View>
+          <View style={styles.familyText}>
+            <Text style={[styles.familyTitle, { color: highContrast ? '#FFFFFF' : '#183E2A' }]}>
+              {contact ? `${contact.name} is in your circle` : 'Add someone you trust'}
+            </Text>
+            <Text style={[styles.familySubtitle, { color: highContrast ? '#E2E8F0' : '#2F5741' }]}>
+              {contact
+                ? 'You can call them whenever you need help.'
+                : 'Family Circle keeps a trusted person close.'}
             </Text>
           </View>
+          {!isNarrow && (
+            <Text style={[styles.chevron, { color: highContrast ? '#FFFFFF' : '#183E2A' }]}>›</Text>
+          )}
+        </Pressable>
 
+        <View
+          style={[
+            styles.tipCard,
+            {
+              backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
+              borderColor: highContrast ? '#FFFFFF' : '#E0E5E1',
+            },
+          ]}
+        >
+          <Heading level={2} style={styles.tipLabel} color={highContrast ? '#CBD5E1' : '#795046'}>
+            A small tip for today
+          </Heading>
           <Text
             style={[
-              styles.cardDescription,
+              styles.tipText,
               {
                 fontSize: getBodySize(),
-                color: highContrast ? '#E2E8F0' : '#334155',
-                lineHeight: getBodySize() * 1.45,
+                color: highContrast ? '#E2E8F0' : '#33434B',
+                lineHeight: (getBodySize() - 1) * 1.4,
               },
             ]}
           >
-            Practice spotting fake bank texts, strange bills, and package tricks with friendly, bite-sized scenarios.
+            A real bank will never ask you to read a secret code over the phone.
           </Text>
-
-          <BigButton
-            label="START A LESSON  ➔"
-            variant="primary"
-            onPress={() => setScreen('catalog')}
-            minHeight={56}
-          />
-        </View>
-
-        {/* Action Card 2: Check a Suspicious Message */}
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
-              borderColor: highContrast ? '#FFFFFF' : '#E2E8F0',
-            },
-          ]}
-        >
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>🛡️</Text>
-            <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-              CHECK A SUSPICIOUS MESSAGE
-            </Text>
-          </View>
-
-          <Text
-            style={[
-              styles.cardDescription,
-              {
-                fontSize: getBodySize(),
-                color: highContrast ? '#E2E8F0' : '#334155',
-                lineHeight: getBodySize() * 1.45,
-              },
-            ]}
-          >
-            Got a weird text, bill, or popup? Paste it or take a photo to see right away if it is safe or a scam.
-          </Text>
-
-          <BigButton
-            label="CHECK A MESSAGE NOW  ➔"
-            variant="primary"
-            onPress={() => setScreen('scam-check')}
-            minHeight={56}
-          />
-        </View>
-
-        {/* Action Card 3: Family Safety Circle */}
-        <View
-          style={[
-            styles.card,
-            {
-              backgroundColor: highContrast ? '#1E293B' : '#FFFFFF',
-              borderColor: highContrast ? '#FFFFFF' : '#E2E8F0',
-            },
-          ]}
-        >
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardEmoji}>👨‍👩‍👧</Text>
-            <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-              FAMILY SAFETY CIRCLE
-            </Text>
-          </View>
-
-          <Text
-            style={[
-              styles.cardDescription,
-              {
-                fontSize: getBodySize() - 2,
-                color: highContrast ? '#CBD5E1' : '#64748B',
-                lineHeight: (getBodySize() - 2) * 1.4,
-              },
-            ]}
-          >
-            Connected with: {contactNames}
-          </Text>
-
-          <BigButton
-            label="🚨 ASK FAMILY FOR HELP"
-            variant="danger"
-            onPress={handleEmergencyHelp}
-            minHeight={56}
-          />
-
-          <View style={{ marginTop: 8 }}>
-            <BigButton
-              label="View Trusted Contacts"
-              variant="outline"
-              onPress={() => setScreen('family')}
-              minHeight={48}
-            />
-          </View>
         </View>
       </ScrollView>
     </View>
@@ -204,61 +203,115 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 18,
-    paddingBottom: 40,
+    padding: 20,
+    paddingBottom: 32,
   },
-  greetingSection: {
-    marginVertical: 14,
+  intro: {
+    marginTop: 12,
+    marginBottom: 18,
   },
-  greetingTitle: {
-    fontSize: 26,
+  headline: {
+    fontSize: 32,
     fontWeight: '800',
-    marginBottom: 6,
-    letterSpacing: -0.4,
+    lineHeight: 37,
+    marginBottom: 8,
+    letterSpacing: -0.3,
   },
-  greetingSubtitle: {
+  subtitle: {
     fontWeight: '500',
   },
-  helpAlertBanner: {
-    backgroundColor: '#FEE2E2',
-    borderWidth: 2,
-    borderColor: '#DC2626',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 16,
-  },
-  helpAlertText: {
-    color: '#991B1B',
-    fontSize: 17,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  card: {
+  sessionCard: {
     borderRadius: 22,
-    padding: 20,
-    marginBottom: 18,
     borderWidth: 1,
+    padding: 18,
+    marginTop: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
     elevation: 2,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  cardEmoji: {
-    fontSize: 28,
-    marginRight: 10,
-  },
-  cardTitle: {
-    fontSize: 20,
+  kicker: {
+    fontSize: 18,
     fontWeight: '800',
     letterSpacing: 0.2,
+    marginBottom: 5,
   },
-  cardDescription: {
-    marginBottom: 16,
+  sessionTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    lineHeight: 29,
+    marginBottom: 5,
+  },
+  sessionGoal: {
+    marginBottom: 12,
+  },
+  sessionMetaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  meta: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  link: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  familyCard: {
+    minHeight: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderRadius: 20,
+    padding: 14,
+    marginTop: 16,
+  },
+  familyCardNarrow: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  familyIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E5E3A',
+  },
+  familyIconAdd: {
+    backgroundColor: '#18334D',
+  },
+  familyText: {
+    flex: 1,
+  },
+  familyTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  familySubtitle: {
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  chevron: {
+    fontSize: 30,
+    fontWeight: '700',
+  },
+  tipCard: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 16,
+    marginTop: 16,
+  },
+  tipLabel: {
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  tipText: {
+    fontWeight: '500',
   },
 });

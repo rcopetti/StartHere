@@ -5,28 +5,33 @@
 
 import React from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
+import { HeartHandshake } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
+import { ROUTES } from '../navigation/routes';
 import type { FontSizePreference } from '../types';
 
 export const OnboardingScreen: React.FC = () => {
-  const { fontSize, setFontSize, role, setRole, setScreen, highContrast } = useApp();
+  const { fontSize, setFontSize, role, setRole, highContrast } = useApp();
+  const navigate = useNavigate();
 
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
         return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
   const options: Array<{ id: FontSizePreference; label: string; badge?: string }> = [
-    { id: 'standard', label: 'Standard Text (18px)' },
-    { id: 'large', label: 'Large Text (20px)', badge: 'Recommended' },
+    { id: 'standard', label: 'Standard Text (20px)' },
+    { id: 'large', label: 'Large Text (22px)', badge: 'Recommended' },
     { id: 'extra_large', label: 'Extra Large Text (24px)' },
   ];
 
@@ -34,20 +39,15 @@ export const OnboardingScreen: React.FC = () => {
     <ScrollView
       style={[
         styles.container,
-        { backgroundColor: highContrast ? '#000000' : '#F8FAFC' },
+        { backgroundColor: highContrast ? '#000000' : '#FAF8F5' },
       ]}
       contentContainerStyle={styles.contentContainer}
     >
       <View style={styles.heroSection}>
-        <Text style={styles.waveEmoji}>👋</Text>
-        <Text
-          style={[
-            styles.title,
-            { color: highContrast ? '#FFFFFF' : '#0F172A' },
-          ]}
-        >
+        <HeartHandshake size={48} strokeWidth={2} color="#1E5E3A" aria-hidden="true" focusable="false" />
+        <Heading level={1} style={styles.title} color={highContrast ? '#FFFFFF' : '#0F172A'}>
           Welcome to StartHere
-        </Text>
+        </Heading>
         <Text
           style={[
             styles.subtitle,
@@ -71,62 +71,61 @@ export const OnboardingScreen: React.FC = () => {
           },
         ]}
       >
-        <Text
-          style={[
-            styles.sectionHeading,
-            { color: highContrast ? '#FFFFFF' : '#1E293B' },
-          ]}
-        >
-          CHOOSE YOUR TEXT SIZE:
-        </Text>
+        <Heading level={2} style={styles.sectionHeading} color={highContrast ? '#FFFFFF' : '#1E293B'}>
+          Choose your text size
+        </Heading>
 
-        {options.map((opt) => {
-          const isSelected = fontSize === opt.id;
-          return (
-            <Pressable
-              key={opt.id}
-              onPress={() => setFontSize(opt.id)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: isSelected }}
-              style={({ pressed }: { pressed: boolean }) => [
-                styles.optionRow,
-                {
-                  backgroundColor: isSelected
-                    ? highContrast
-                      ? '#334155'
-                      : '#EFF6FF'
-                    : 'transparent',
-                  borderColor: isSelected ? '#2563EB' : '#CBD5E1',
-                  opacity: pressed ? 0.8 : 1,
-                },
-              ]}
-            >
-              <View style={styles.radioOuter}>
-                {isSelected && <View style={styles.radioInner} />}
-              </View>
-              <Text
-                style={[
-                  styles.optionLabel,
+        <View role="radiogroup" aria-label="Choose your text size">
+          {options.map((opt) => {
+            const isSelected = fontSize === opt.id;
+            return (
+              <Pressable
+                key={opt.id}
+                onPress={() => setFontSize(opt.id)}
+                accessibilityRole="radio"
+                aria-checked={isSelected}
+                style={({ pressed }: { pressed: boolean }) => [
+                  styles.optionRow,
                   {
-                    fontSize: opt.id === 'standard' ? 18 : opt.id === 'large' ? 20 : 22,
-                    color: highContrast ? '#FFFFFF' : '#0F172A',
-                    fontWeight: isSelected ? '700' : '500',
+                    backgroundColor: isSelected
+                      ? highContrast
+                        ? '#334155'
+                        : '#EFF6FF'
+                      : 'transparent',
+                    borderColor: isSelected ? '#2563EB' : '#CBD5E1',
+                    opacity: pressed ? 0.8 : 1,
                   },
                 ]}
               >
-                {opt.label}
-              </Text>
-              {opt.badge && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{opt.badge}</Text>
+                <View style={styles.radioOuter}>
+                  {isSelected && <View style={styles.radioInner} />}
                 </View>
-              )}
-            </Pressable>
-          );
-        })}
+                <View style={styles.optionTextBlock}>
+                  <Text
+                    style={[
+                      styles.optionLabel,
+                      {
+                        fontSize: opt.id === 'standard' ? 20 : opt.id === 'large' ? 22 : 24,
+                        color: highContrast ? '#FFFFFF' : '#0F172A',
+                        fontWeight: isSelected ? '700' : '500',
+                      },
+                    ]}
+                  >
+                    {opt.label}
+                  </Text>
+                  {opt.badge && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{opt.badge}</Text>
+                    </View>
+                  )}
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
 
         <View style={styles.previewBox}>
-          <Text style={styles.previewCaption}>PREVIEW:</Text>
+          <Text style={styles.previewCaption}>Preview</Text>
           <Text
             style={[
               styles.previewText,
@@ -151,14 +150,9 @@ export const OnboardingScreen: React.FC = () => {
           },
         ]}
       >
-        <Text
-          style={[
-            styles.sectionHeading,
-            { color: highContrast ? '#FFFFFF' : '#1E293B' },
-          ]}
-        >
-          WHO IS USING THIS PHONE?
-        </Text>
+        <Heading level={2} style={styles.sectionHeading} color={highContrast ? '#FFFFFF' : '#1E293B'}>
+          Who is using this phone?
+        </Heading>
 
         <Pressable
           onPress={() => setRole('senior')}
@@ -170,7 +164,7 @@ export const OnboardingScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={styles.roleTitle}>👴 I am a Senior</Text>
+          <Text style={styles.roleTitle}>I am a senior</Text>
           <Text style={styles.roleDescription}>
             I want help with my phone and protection from scam messages.
           </Text>
@@ -186,7 +180,7 @@ export const OnboardingScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={styles.roleTitle}>👨‍👩‍👧 I am a Family Member / Carer</Text>
+          <Text style={styles.roleTitle}>I am a family member or carer</Text>
           <Text style={styles.roleDescription}>
             I want to link to a loved one's phone and receive instant scam alerts.
           </Text>
@@ -198,7 +192,7 @@ export const OnboardingScreen: React.FC = () => {
         <BigButton
           label="GET STARTED  ➔"
           variant="primary"
-          onPress={() => setScreen(role === 'family' ? 'family-portal' : 'home')}
+          onPress={() => navigate(role === 'family' ? ROUTES.familyPortal : ROUTES.home)}
           minHeight={58}
         />
       </View>
@@ -219,14 +213,12 @@ const styles = StyleSheet.create({
     marginVertical: 18,
     textAlign: 'center',
   },
-  waveEmoji: {
-    fontSize: 44,
-    marginBottom: 8,
-  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '800',
+    lineHeight: 37,
     textAlign: 'center',
+    marginTop: 10,
     marginBottom: 10,
     letterSpacing: -0.5,
   },
@@ -242,7 +234,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   sectionHeading: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     marginBottom: 14,
     letterSpacing: 0.5,
@@ -272,10 +264,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#2563EB',
   },
-  optionLabel: {
+  optionTextBlock: {
     flex: 1,
   },
+  optionLabel: {
+    flexShrink: 1,
+  },
   badge: {
+    alignSelf: 'flex-start',
+    marginTop: 4,
     backgroundColor: '#DBEAFE',
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -283,21 +280,21 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: '#1E40AF',
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: '700',
   },
   previewBox: {
     marginTop: 10,
     padding: 14,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
   previewCaption: {
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#475569',
     marginBottom: 4,
   },
   previewText: {
@@ -311,14 +308,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   roleTitle: {
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: '700',
     color: '#0F172A',
     marginBottom: 4,
   },
   roleDescription: {
-    fontSize: 15,
-    color: '#64748B',
+    fontSize: 18,
+    color: '#475569',
     lineHeight: 22,
   },
   actionContainer: {

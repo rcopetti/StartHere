@@ -5,12 +5,16 @@
 
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TextInput, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
+import { ROUTES } from '../navigation/routes';
 
 export const FamilyCircleScreen: React.FC = () => {
-  const { trustedContacts, triggerEmergencyHelp, inviteFamilyMember, setScreen, fontSize, highContrast } = useApp();
+  const { trustedContacts, triggerEmergencyHelp, inviteFamilyMember, fontSize, highContrast } = useApp();
+  const navigate = useNavigate();
   const [helpSent, setHelpSent] = useState(false);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteName, setInviteName] = useState('');
@@ -21,12 +25,12 @@ export const FamilyCircleScreen: React.FC = () => {
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 17;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 19;
+        return 22;
     }
   };
 
@@ -47,19 +51,20 @@ export const FamilyCircleScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
-        title="👨‍👩‍👧 Family Circle"
+        title="Family Circle"
         showBack
-        onBack={() => setScreen('home')}
-        showSettings
+        onBack={() => navigate(ROUTES.home)}
+        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Heading level={1} style={styles.srOnly}>Family Circle</Heading>
         {/* Panic / Emergency Button Hero */}
         <View style={styles.emergencyCard}>
           <BigButton
-            label="🚨 ASK FAMILY FOR HELP NOW"
+            label="ASK FAMILY FOR HELP NOW"
             sublabel="Tap here to send an urgent help alert to your circle immediately"
             variant="danger"
             onPress={handlePanicAlert}
@@ -76,9 +81,9 @@ export const FamilyCircleScreen: React.FC = () => {
         )}
 
         {/* Contact List */}
-        <Text style={[styles.sectionHeading, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-          YOUR TRUSTED CONTACTS ({trustedContacts.length}):
-        </Text>
+        <Heading level={2} style={styles.sectionHeading} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+          Your trusted contacts ({trustedContacts.length})
+        </Heading>
 
         {trustedContacts.map((contact) => (
           <View
@@ -109,7 +114,7 @@ export const FamilyCircleScreen: React.FC = () => {
                     styles.contactPhone,
                     {
                       fontSize: getBodySize() - 2,
-                      color: highContrast ? '#CBD5E1' : '#64748B',
+                      color: highContrast ? '#CBD5E1' : '#475569',
                     },
                   ]}
                 >
@@ -142,15 +147,15 @@ export const FamilyCircleScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={[styles.inviteTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-            ➕ Invite Another Family Member
-          </Text>
+          <Heading level={2} style={styles.inviteTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+            Invite another family member
+          </Heading>
           <Text
             style={[
               styles.inviteSubtitle,
               {
                 fontSize: getBodySize() - 2,
-                color: highContrast ? '#CBD5E1' : '#64748B',
+                color: highContrast ? '#CBD5E1' : '#475569',
               },
             ]}
           >
@@ -176,7 +181,7 @@ export const FamilyCircleScreen: React.FC = () => {
                   {
                     fontSize: getBodySize() - 1,
                     color: highContrast ? '#FFFFFF' : '#0F172A',
-                    backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                    backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                     borderColor: '#CBD5E1',
                   },
                 ]}
@@ -192,7 +197,7 @@ export const FamilyCircleScreen: React.FC = () => {
                   {
                     fontSize: getBodySize() - 1,
                     color: highContrast ? '#FFFFFF' : '#0F172A',
-                    backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                    backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                     borderColor: '#CBD5E1',
                   },
                 ]}
@@ -209,7 +214,7 @@ export const FamilyCircleScreen: React.FC = () => {
                   {
                     fontSize: getBodySize() - 1,
                     color: highContrast ? '#FFFFFF' : '#0F172A',
-                    backgroundColor: highContrast ? '#0F172A' : '#F8FAFC',
+                    backgroundColor: highContrast ? '#0F172A' : '#FAF8F5',
                     borderColor: '#CBD5E1',
                   },
                 ]}
@@ -245,6 +250,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  srOnly: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    overflow: 'hidden',
+  },
   scrollContent: {
     padding: 18,
     paddingBottom: 40,
@@ -262,12 +273,12 @@ const styles = StyleSheet.create({
   },
   alertSentText: {
     color: '#991B1B',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
   },
   sectionHeading: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     letterSpacing: 0.4,
     marginBottom: 12,
@@ -303,7 +314,7 @@ const styles = StyleSheet.create({
   },
   activePillText: {
     color: '#166534',
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '700',
   },
   inviteCard: {
@@ -339,19 +350,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   tokenTitle: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
     color: '#065F46',
     marginBottom: 4,
   },
   tokenText: {
-    fontSize: 13,
+    fontSize: 16,
     color: '#0F172A',
     fontWeight: '700',
     marginBottom: 6,
   },
   tokenHint: {
-    fontSize: 13,
+    fontSize: 16,
     color: '#047857',
   },
 });

@@ -5,9 +5,12 @@
 
 import React from 'react';
 import { View, Text, ScrollView, Pressable, Switch, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
+import { ROUTES } from '../navigation/routes';
 import type { FontSizePreference } from '../types';
 
 export const SettingsScreen: React.FC = () => {
@@ -20,24 +23,25 @@ export const SettingsScreen: React.FC = () => {
     toggleAutoAlert,
     role,
     setRole,
-    setScreen,
   } = useApp();
+  const navigate = useNavigate();
 
   const fontOptions: Array<{ id: FontSizePreference; label: string }> = [
-    { id: 'standard', label: 'Standard Text (18px)' },
-    { id: 'large', label: 'Large Text (20px) [Recommended]' },
+    { id: 'standard', label: 'Standard Text (20px)' },
+    { id: 'large', label: 'Large Text (22px) [Recommended]' },
     { id: 'extra_large', label: 'Extra Large Text (24px)' },
   ];
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
-        title="⚙️ Settings"
+        title="Settings"
         showBack
-        onBack={() => setScreen(role === 'family' ? 'family-portal' : 'home')}
+        onBack={() => navigate(role === 'family' ? ROUTES.familyPortal : ROUTES.home)}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Heading level={1} style={styles.srOnly}>Settings</Heading>
         {/* Text Display Size */}
         <View
           style={[
@@ -48,9 +52,9 @@ export const SettingsScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-            TEXT DISPLAY SIZE:
-          </Text>
+          <Heading level={2} style={styles.cardTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+            Text display size
+          </Heading>
           <Text style={styles.cardSubtitle}>
             Choose the size that feels most comfortable for your eyes:
           </Text>
@@ -105,9 +109,9 @@ export const SettingsScreen: React.FC = () => {
         >
           <View style={styles.toggleRow}>
             <View style={{ flex: 1, marginRight: 12 }}>
-              <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-                High Contrast Mode
-              </Text>
+              <Heading level={2} style={styles.cardTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+                High contrast mode
+              </Heading>
               <Text style={styles.cardSubtitle}>
                 Extra bold black and white surfaces for sunlight legibility.
               </Text>
@@ -116,6 +120,7 @@ export const SettingsScreen: React.FC = () => {
               value={highContrast}
               onValueChange={setHighContrast}
               trackColor={{ false: '#CBD5E1', true: '#2563EB' }}
+              accessibilityLabel="High contrast mode"
             />
           </View>
         </View>
@@ -132,9 +137,9 @@ export const SettingsScreen: React.FC = () => {
         >
           <View style={styles.toggleRow}>
             <View style={{ flex: 1, marginRight: 12 }}>
-              <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-                Auto-Alert Family on Scams
-              </Text>
+              <Heading level={2} style={styles.cardTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+                Auto-alert family on scams
+              </Heading>
               <Text style={styles.cardSubtitle}>
                 Automatically sends an alert to Sarah and Tom whenever a high-risk scam is detected.
               </Text>
@@ -143,6 +148,7 @@ export const SettingsScreen: React.FC = () => {
               value={user?.autoAlertOnScam ?? true}
               onValueChange={toggleAutoAlert}
               trackColor={{ false: '#CBD5E1', true: '#2563EB' }}
+              accessibilityLabel="Auto-alert family on scams"
             />
           </View>
         </View>
@@ -157,9 +163,9 @@ export const SettingsScreen: React.FC = () => {
             },
           ]}
         >
-          <Text style={[styles.cardTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-            ACTIVE VIEW / ROLE:
-          </Text>
+          <Heading level={2} style={styles.cardTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+            Active view or role
+          </Heading>
           <Text style={styles.cardSubtitle}>
             Currently viewing as: <Text style={{ fontWeight: '700' }}>{role === 'family' ? 'Family Member / Carer' : 'Senior User (Eleanor)'}</Text>
           </Text>
@@ -188,6 +194,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  srOnly: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    overflow: 'hidden',
+  },
   scrollContent: {
     padding: 18,
     paddingBottom: 40,
@@ -204,14 +216,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
     marginBottom: 4,
   },
   cardSubtitle: {
-    fontSize: 14,
-    color: '#64748B',
-    lineHeight: 20,
+    fontSize: 18,
+    color: '#475569',
+    lineHeight: 25,
     marginBottom: 12,
   },
   optionRow: {
@@ -253,7 +265,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   aboutText: {
-    fontSize: 13,
+    fontSize: 18,
     color: '#94A3B8',
     marginBottom: 4,
     textAlign: 'center',

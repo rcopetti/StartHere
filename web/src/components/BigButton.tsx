@@ -12,7 +12,7 @@ interface BigButtonProps {
   label: string;
   sublabel?: string;
   onPress: () => void;
-  variant?: 'primary' | 'danger' | 'secondary' | 'success' | 'outline';
+  variant?: 'primary' | 'navy' | 'danger' | 'secondary' | 'success' | 'outline';
   icon?: React.ReactNode;
   disabled?: boolean;
   minHeight?: number;
@@ -32,12 +32,12 @@ export const BigButton: React.FC<BigButtonProps> = ({
   const getFontSize = () => {
     switch (fontSize) {
       case 'standard':
-        return 18;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 20;
+        return 22;
     }
   };
 
@@ -52,6 +52,8 @@ export const BigButton: React.FC<BigButtonProps> = ({
         return pressed ? '#E2E8F0' : '#F1F5F9';
       case 'outline':
         return pressed ? '#F8FAFC' : '#FFFFFF';
+      case 'navy':
+        return pressed ? '#0F2539' : '#18334D';
       case 'primary':
       default:
         return pressed ? '#1D4ED8' : '#2563EB';
@@ -95,6 +97,7 @@ export const BigButton: React.FC<BigButtonProps> = ({
               styles.label,
               {
                 fontSize: getFontSize(),
+                lineHeight: getFontSize() * 1.2,
                 color: getTextColor(),
                 fontWeight: highContrast ? '800' : '700',
               },
@@ -108,8 +111,8 @@ export const BigButton: React.FC<BigButtonProps> = ({
                 styles.sublabel,
                 {
                   fontSize: getFontSize() - 4,
+                  lineHeight: (getFontSize() - 4) * 1.35,
                   color: getTextColor(),
-                  opacity: 0.9,
                 },
               ]}
             >
@@ -149,6 +152,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textContainer: {
+    flex: 1,
+    minWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

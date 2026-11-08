@@ -4,15 +4,20 @@
  * Features State 4A (Challenge Scene) and State 4B (Instant Coach Explanation & Verdict Feedback)
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Bot } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { ScenarioDeviceCard } from '../components/ScenarioDeviceCard';
+import { ROUTES } from '../navigation/routes';
 
 export const ScenarioLessonScreen: React.FC = () => {
   const {
+    allLessons,
     activeLesson,
     activeStepIndex,
     currentStep,
@@ -21,12 +26,37 @@ export const ScenarioLessonScreen: React.FC = () => {
     answerScenario,
     nextScenario,
     exitLesson,
+    startLesson,
+    loading,
     fontSize,
     highContrast,
   } = useApp();
+  const { lessonId } = useParams<{ lessonId: string }>();
+  const navigate = useNavigate();
 
-  if (!activeLesson || !currentStep) {
-    return null;
+  const routeLesson = allLessons.find((lesson) => lesson.lessonId === lessonId);
+
+  useEffect(() => {
+    if (!lessonId) return;
+    if (!activeLesson || activeLesson.lessonId !== lessonId) {
+      if (routeLesson) startLesson(routeLesson);
+    }
+  }, [lessonId, activeLesson, routeLesson, startLesson]);
+
+  if (!lessonId) {
+    return <Navigate to={ROUTES.coach} replace />;
+  }
+
+  if (!activeLesson || !currentStep || activeLesson.lessonId !== lessonId) {
+    if (!loading && !routeLesson) {
+      return <Navigate to={ROUTES.coach} replace />;
+    }
+
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Getting your session ready…</Text>
+      </View>
+    );
   }
 
   const totalSteps = activeLesson.steps.length;
@@ -36,28 +66,39 @@ export const ScenarioLessonScreen: React.FC = () => {
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 17;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 19;
+        return 22;
     }
   };
 
   const isLastQuestion = currentNum === totalSteps;
 
+  const handleNext = () => {
+    const finished = nextScenario();
+    if (finished) navigate(ROUTES.coachComplete(activeLesson.lessonId));
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       {/* Top Header */}
       <AppHeader
-        title={activeLesson.title}
+        title="Practice"
         showClose
-        onClose={exitLesson}
-        rightLabel={`Q ${currentNum}/${totalSteps}`}
+        onClose={() => {
+          exitLesson();
+          navigate(ROUTES.coach);
+        }}
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Heading level={1} style={styles.lessonName} color={highContrast ? '#CBD5E1' : '#52605F'}>
+          {activeLesson.title}
+        </Heading>
+
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBarTrack}>
@@ -66,7 +107,7 @@ export const ScenarioLessonScreen: React.FC = () => {
           <Text
             style={[
               styles.progressText,
-              { color: highContrast ? '#CBD5E1' : '#64748B' },
+              { color: highContrast ? '#CBD5E1' : '#475569' },
             ]}
           >
             Question {currentNum} of {totalSteps}
@@ -81,7 +122,8 @@ export const ScenarioLessonScreen: React.FC = () => {
 
             {/* Question Prompt */}
             <View style={styles.questionPromptBox}>
-              <Text
+              <Heading
+                level={2}
                 style={[
                   styles.questionPromptText,
                   {
@@ -90,27 +132,27 @@ export const ScenarioLessonScreen: React.FC = () => {
                   },
                 ]}
               >
-                ❓ Is this a legit message or a scam?
-              </Text>
+                Does this look safe, or could it be a scam?
+              </Heading>
             </View>
 
             {/* Option A: Legit */}
             <View style={styles.choiceRow}>
               <BigButton
-                label="A.  Legit"
+                label="Looks safe"
                 variant="outline"
                 onPress={() => answerScenario('legit')}
-                minHeight={58}
+                minHeight={64}
               />
             </View>
 
             {/* Option B: Scam */}
             <View style={styles.choiceRow}>
               <BigButton
-                label="B.  Scam"
+                label="This is a scam"
                 variant="outline"
                 onPress={() => answerScenario('scam')}
-                minHeight={58}
+                minHeight={64}
               />
             </View>
           </View>
@@ -170,9 +212,9 @@ export const ScenarioLessonScreen: React.FC = () => {
               ]}
             >
               <View style={styles.coachTitleRow}>
-                <Text style={styles.coachEmoji}>🤖</Text>
+                <Bot size={24} strokeWidth={2.2} color={highContrast ? '#FFFFFF' : '#18334D'} aria-hidden="true" focusable="false" />
                 <Text style={[styles.coachHeading, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-                  PATIENT COACH EXPLANATION:
+                  Coach explanation
                 </Text>
               </View>
 
@@ -248,8 +290,8 @@ export const ScenarioLessonScreen: React.FC = () => {
               <BigButton
                 label={isLastQuestion ? 'FINISH LESSON & SEE SCORE 🎉' : `NEXT QUESTION ➔ (${currentNum + 1} of ${totalSteps})`}
                 variant="primary"
-                onPress={nextScenario}
-                minHeight={58}
+                onPress={handleNext}
+                minHeight={64}
               />
             </View>
           </View>
@@ -263,9 +305,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#FAF8F5',
+  },
+  loadingText: {
+    color: '#1A1A1A',
+    fontSize: 20,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   scrollContent: {
     padding: 18,
     paddingBottom: 40,
+  },
+  lessonName: {
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 8,
   },
   progressContainer: {
     marginBottom: 16,
@@ -279,11 +339,11 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1E5E3A',
     borderRadius: 5,
   },
   progressText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'right',
   },
@@ -313,7 +373,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   feedbackBannerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
     textAlign: 'center',
     letterSpacing: 0.2,
@@ -334,14 +394,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  coachEmoji: {
-    fontSize: 24,
-    marginRight: 8,
-  },
   coachHeading: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    marginLeft: 8,
   },
   coachBody: {
     fontWeight: '500',
@@ -353,9 +409,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   signalsHeading: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
     marginBottom: 10,
   },
   bulletRow: {
@@ -364,7 +419,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   bulletDot: {
-    color: '#64748B',
+    color: '#475569',
     fontSize: 18,
     marginRight: 8,
     lineHeight: 22,
@@ -378,9 +433,8 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   safeActionHeading: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.4,
     marginBottom: 6,
   },
   safeActionText: {

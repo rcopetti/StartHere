@@ -5,22 +5,29 @@
 
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useNavigate } from 'react-router-dom';
+import { CircleCheck, UserRound } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
+import { ROUTES } from '../navigation/routes';
 
 export const FamilyPortalScreen: React.FC = () => {
-  const { alerts, acknowledgeFamilyAlert, setRole, setScreen, highContrast } = useApp();
+  const { alerts, acknowledgeFamilyAlert, setRole, highContrast } = useApp();
+  const navigate = useNavigate();
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
         title="Family Portal"
-        rightLabel="Sarah (Daughter)"
-        showSettings
+        showBack
+        onBack={() => navigate(ROUTES.home)}
+        showPersonMenu
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Heading level={1} style={styles.srOnly}>Family Portal</Heading>
         {/* Protected Senior Profile Card */}
         <View
           style={[
@@ -32,21 +39,21 @@ export const FamilyPortalScreen: React.FC = () => {
           ]}
         >
           <View style={styles.seniorAvatarCircle}>
-            <Text style={{ fontSize: 28 }}>👵</Text>
+            <UserRound size={28} strokeWidth={2.2} color="#18334D" aria-hidden="true" focusable="false" />
           </View>
           <View style={styles.seniorInfo}>
             <Text style={[styles.seniorName, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
               Protected Senior: Eleanor Miller
             </Text>
             <Text style={styles.seniorPhone}>Phone: (555) 345-6789</Text>
-            <Text style={styles.seniorStatus}>🟢 Safety Monitoring: Active</Text>
+            <Text style={styles.seniorStatus}>Safety monitoring: active</Text>
           </View>
         </View>
 
         {/* Incoming Alerts Header */}
-        <Text style={[styles.sectionHeading, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
-          SAFETY ALERTS & NOTIFICATIONS ({alerts.length}):
-        </Text>
+        <Heading level={2} style={styles.sectionHeading} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+          Safety alerts and notifications ({alerts.length})
+        </Heading>
 
         {alerts.length === 0 ? (
           <View
@@ -58,10 +65,10 @@ export const FamilyPortalScreen: React.FC = () => {
               },
             ]}
           >
-            <Text style={{ fontSize: 32, marginBottom: 8 }}>✅</Text>
-            <Text style={[styles.emptyTitle, { color: highContrast ? '#FFFFFF' : '#0F172A' }]}>
+            <CircleCheck size={40} strokeWidth={2.2} color="#059669" aria-hidden="true" focusable="false" style={{ marginBottom: 8 }} />
+            <Heading level={2} style={styles.emptyTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
               All is calm
-            </Text>
+            </Heading>
             <Text style={styles.emptySubtitle}>
               Eleanor has not sent any emergency requests or encountered high-risk scams today.
             </Text>
@@ -100,7 +107,7 @@ export const FamilyPortalScreen: React.FC = () => {
                 <Text style={styles.alertSummary}>{alert.summary}</Text>
 
                 <View style={styles.alertStatusBox}>
-                  <Text style={styles.statusLabel}>STATUS:</Text>
+                  <Text style={styles.statusLabel}>Status:</Text>
                   <Text style={[styles.statusValue, { color: isAcked ? '#059669' : '#D97706' }]}>
                     {isAcked
                       ? `✅ Handled by ${alert.acknowledgedBy || 'Sarah'}`
@@ -135,7 +142,9 @@ export const FamilyPortalScreen: React.FC = () => {
 
         {/* Switch Role shortcut */}
         <View style={styles.switchRoleCard}>
-          <Text style={styles.switchRoleTitle}>Switch to Senior Phone View</Text>
+          <Heading level={2} style={styles.switchRoleTitle} color={highContrast ? '#FFFFFF' : '#0F172A'}>
+            Switch to senior phone view
+          </Heading>
           <Text style={styles.switchRoleSubtitle}>
             Want to see how StartHere looks on Eleanor's phone?
           </Text>
@@ -144,7 +153,7 @@ export const FamilyPortalScreen: React.FC = () => {
             variant="outline"
             onPress={() => {
               setRole('senior');
-              setScreen('home');
+              navigate(ROUTES.home);
             }}
             minHeight={48}
           />
@@ -157,6 +166,12 @@ export const FamilyPortalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  srOnly: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    overflow: 'hidden',
   },
   scrollContent: {
     padding: 18,
@@ -193,19 +208,18 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   seniorPhone: {
-    fontSize: 14,
-    color: '#64748B',
+    fontSize: 18,
+    color: '#475569',
     marginBottom: 2,
   },
   seniorStatus: {
-    fontSize: 13,
-    color: '#059669',
-    fontWeight: '600',
+    fontSize: 18,
+    color: '#065F46',
+    fontWeight: '700',
   },
   sectionHeading: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.5,
     marginBottom: 12,
   },
   emptyCard: {
@@ -222,10 +236,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   emptySubtitle: {
-    fontSize: 15,
-    color: '#64748B',
+    fontSize: 18,
+    color: '#475569',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   alertCard: {
     borderRadius: 20,
@@ -246,13 +260,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   alertBadgeText: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '800',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
   alertTimestamp: {
-    fontSize: 13,
-    color: '#64748B',
+    fontSize: 18,
+    color: '#475569',
     marginBottom: 6,
     fontWeight: '500',
   },
@@ -262,7 +276,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   alertSummary: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#334155',
     lineHeight: 24,
     marginBottom: 12,
@@ -270,19 +284,19 @@ const styles = StyleSheet.create({
   alertStatusBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF8F5',
     padding: 10,
     borderRadius: 10,
     marginBottom: 14,
   },
   statusLabel: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#475569',
     marginRight: 8,
   },
   statusValue: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
   },
   actionRow: {
@@ -296,14 +310,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchRoleTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#0F172A',
     marginBottom: 4,
   },
   switchRoleSubtitle: {
-    fontSize: 14,
-    color: '#64748B',
+    fontSize: 18,
+    color: '#475569',
     textAlign: 'center',
     marginBottom: 12,
   },

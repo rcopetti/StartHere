@@ -5,28 +5,32 @@
 
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { BigButton } from '../components/BigButton';
+import { Heading } from '../components/Heading';
 import { VerdictBanner } from '../components/VerdictBanner';
+import { ROUTES } from '../navigation/routes';
 
 export const ScamVerdictScreen: React.FC = () => {
-  const { activeScamResult, setScreen, fontSize, highContrast, triggerEmergencyHelp } = useApp();
+  const { activeScamResult, fontSize, highContrast, triggerEmergencyHelp } = useApp();
   const [alertSent, setAlertSent] = useState(false);
+  const navigate = useNavigate();
 
   if (!activeScamResult) {
-    return null;
+    return <Navigate to={ROUTES.check} replace />;
   }
 
   const getBodySize = () => {
     switch (fontSize) {
       case 'standard':
-        return 17;
+        return 20;
       case 'extra_large':
-        return 22;
+        return 24;
       case 'large':
       default:
-        return 19;
+        return 22;
     }
   };
 
@@ -36,11 +40,11 @@ export const ScamVerdictScreen: React.FC = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#F8FAFC' }]}>
+    <View style={[styles.container, { backgroundColor: highContrast ? '#000000' : '#FAF8F5' }]}>
       <AppHeader
-        title="🛡️ Scam Result"
+        title="Scam Result"
         showBack
-        onBack={() => setScreen('scam-check')}
+        onBack={() => navigate(ROUTES.check)}
         showSettings
       />
 
@@ -54,7 +58,7 @@ export const ScamVerdictScreen: React.FC = () => {
         {alertSent && (
           <View style={styles.alertSentConfirmation}>
             <Text style={styles.alertSentText}>
-              ✅ Alert sent to Sarah and Tom! Your family has been notified.
+              Alert sent to Sarah and Tom. Your family has been notified.
             </Text>
           </View>
         )}
@@ -70,9 +74,9 @@ export const ScamVerdictScreen: React.FC = () => {
           ]}
         >
           {/* Headline */}
-          <Text style={[styles.sectionLabel, { color: highContrast ? '#CBD5E1' : '#64748B' }]}>
-            HEADLINE:
-          </Text>
+          <Heading level={2} style={styles.sectionLabel} color={highContrast ? '#CBD5E1' : '#475569'}>
+            What we found
+          </Heading>
           <Text
             style={[
               styles.headlineText,
@@ -86,9 +90,9 @@ export const ScamVerdictScreen: React.FC = () => {
           </Text>
 
           {/* Explanation */}
-          <Text style={[styles.sectionLabel, { color: highContrast ? '#CBD5E1' : '#64748B', marginTop: 14 }]}>
-            WHAT THIS MEANS:
-          </Text>
+          <Heading level={2} style={[styles.sectionLabel, { marginTop: 14 }]} color={highContrast ? '#CBD5E1' : '#475569'}>
+            What this means
+          </Heading>
           <Text
             style={[
               styles.bodyText,
@@ -103,9 +107,9 @@ export const ScamVerdictScreen: React.FC = () => {
           </Text>
 
           {/* Action */}
-          <Text style={[styles.sectionLabel, { color: highContrast ? '#CBD5E1' : '#64748B', marginTop: 14 }]}>
-            RECOMMENDED ACTION:
-          </Text>
+          <Heading level={2} style={[styles.sectionLabel, { marginTop: 14 }]} color={highContrast ? '#CBD5E1' : '#475569'}>
+            What to do now
+          </Heading>
           <Text
             style={[
               styles.actionText,
@@ -116,15 +120,15 @@ export const ScamVerdictScreen: React.FC = () => {
               },
             ]}
           >
-            👉 {activeScamResult.action}
+            {activeScamResult.action}
           </Text>
 
           {/* Signals */}
           {activeScamResult.signals && activeScamResult.signals.length > 0 && (
             <View style={{ marginTop: 14 }}>
-              <Text style={[styles.sectionLabel, { color: highContrast ? '#CBD5E1' : '#64748B' }]}>
-                WARNING SIGNS FOUND:
-              </Text>
+              <Heading level={2} style={styles.sectionLabel} color={highContrast ? '#CBD5E1' : '#475569'}>
+                Warning signs
+              </Heading>
               {activeScamResult.signals.map((sig, idx) => (
                 <View key={idx} style={styles.bulletRow}>
                   <Text style={styles.bulletDot}>•</Text>
@@ -150,17 +154,17 @@ export const ScamVerdictScreen: React.FC = () => {
           {activeScamResult.verdict === 'likely_scam' && (
             <>
               <BigButton
-                label="🚨 NOTIFY FAMILY ABOUT THIS SCAM"
+                label="Notify family about this scam"
                 variant="danger"
                 onPress={handleNotifyFamily}
-                minHeight={56}
+                minHeight={64}
               />
               <View style={{ marginTop: 8 }}>
                 <BigButton
-                  label="🗑️ I DELETED THE MESSAGE — ALL SET"
+                  label="I deleted the message — all set"
                   variant="success"
-                  onPress={() => setScreen('home')}
-                  minHeight={52}
+                  onPress={() => navigate(ROUTES.home)}
+                  minHeight={64}
                 />
               </View>
             </>
@@ -169,17 +173,17 @@ export const ScamVerdictScreen: React.FC = () => {
           {activeScamResult.verdict === 'caution' && (
             <>
               <BigButton
-                label="👨‍👩‍👧 ASK FAMILY TO DOUBLE-CHECK"
+                label="Ask family to double-check"
                 variant="primary"
                 onPress={handleNotifyFamily}
-                minHeight={56}
+                minHeight={64}
               />
               <View style={{ marginTop: 8 }}>
                 <BigButton
-                  label="BACK TO HOME SCREEN"
+                  label="Back to home"
                   variant="outline"
-                  onPress={() => setScreen('home')}
-                  minHeight={52}
+                  onPress={() => navigate(ROUTES.home)}
+                  minHeight={64}
                 />
               </View>
             </>
@@ -187,10 +191,10 @@ export const ScamVerdictScreen: React.FC = () => {
 
           {activeScamResult.verdict === 'looks_safe' && (
             <BigButton
-              label="BACK TO HOME SCREEN"
+              label="Back to home"
               variant="primary"
-              onPress={() => setScreen('home')}
-              minHeight={56}
+              onPress={() => navigate(ROUTES.home)}
+              minHeight={64}
             />
           )}
         </View>
@@ -217,7 +221,7 @@ const styles = StyleSheet.create({
   },
   alertSentText: {
     color: '#065F46',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
   },
@@ -233,9 +237,8 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   sectionLabel: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.5,
     marginBottom: 4,
   },
   headlineText: {
